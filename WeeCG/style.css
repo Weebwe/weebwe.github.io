@@ -8,30 +8,33 @@ body {
     background-color: #0094FE; /* Ваш корпоративний колір */
     color: #FFFFFF; /* Білий - Ваш корпоративний колір */
     overflow: hidden; /* Забороняє прокрутку всього body */
-    padding: 10px; /* Додаємо невеликий відступ від країв екрану */
+    padding: 10px; /* Невеликий відступ від країв екрану */
     box-sizing: border-box; /* Враховує padding у загальному розмірі елемента */
 }
 
 .container {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для контейнера */
-    padding: 20px; /* Трохи зменшив padding, щоб звільнити місце */
+    padding: 20px; /* Внутрішні відступи контейнера */
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    max-width: 400px; /* Обмежуємо максимальну ширину */
+    max-width: 400px; /* Обмежуємо максимальну ширину для великих екранів */
     width: 95%; /* Займає 95% ширини екрану */
     height: 95vh; /* Займає 95% висоти viewport */
-    display: flex; /* Робимо контейнер flex-контейнером */
-    flex-direction: column; /* Елементи всередині розташовуються вертикально */
-    justify-content: space-between; /* Розподіляє простір між елементами (заголовок, монета, бусти) */
-    align-items: center; /* Центрує елементи по горизонталі */
-    box-sizing: border-box; /* Враховує padding у загальному розмірі елемента */
+    display: flex;
+    flex-direction: column;
+    /* Змінено: space-around замість space-between для більш рівномірного розподілу */
+    justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
+    align-items: center;
+    box-sizing: border-box;
 }
 
 h1 {
     font-size: clamp(1.5em, 5vw, 2.5em); /* Адаптивний розмір шрифту */
-    margin-bottom: 15px; /* Трохи зменшив відступ */
+    margin-top: 0; /* Прибираємо верхній відступ, так як space-around його компенсує */
+    margin-bottom: 0; /* Прибираємо нижній відступ */
     color: #FFFFFF;
+    flex-shrink: 0; /* Запобігає зменшенню заголовка */
 }
 
 #score {
@@ -42,34 +45,106 @@ h1 {
     width: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
     height: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
     border-radius: 50%;
-    margin: 15px auto; /* Трохи зменшив відступи */
+    margin: 0; /* Прибираємо зовнішні відступи, так як space-around їх компенсує */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
     transition: transform 0.1s ease-out;
-    border: 5px solid rgba(255, 255, 255, 0.5); /* Додаємо рамку для візуального акценту */
-    overflow: hidden; /* Обрізаємо зображення по кругу, якщо воно виходить за межі */
-    flex-shrink: 0; /* Запобігає зменшенню розміру монети при нестачі місця */
+    border: 5px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+    flex-shrink: 0; /* Запобігає зменшенню розміру монети */
 }
 
 .click-area:active {
-    transform: scale(0.95); /* Ефект натискання */
+    transform: scale(0.95);
 }
 
 .coin-image {
-    width: 100%; /* Зображення заповнює всю область кліку */
-    height: 100%; /* Зображення заповнює всю область кліку */
-    object-fit: contain; /* Зберігає пропорції, вміщаючи зображення в контейнер */
-    display: block; /* Видаляємо зайві відступи, які можуть бути у інлайн-елементів */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .instructions {
-    font-size: clamp(0.9em, 2.5vw, 1.1em); /* Адаптивний розмір шрифту */
-    margin-top: 10px; /* Трохи зменшив відступ */
-    opacity: 0.8; /* Напівпрозорий текст */
+    font-size: clamp(0.9em, 2.5vw, 1.1em);
+    margin-top: 0; /* Прибираємо верхній відступ */
+    margin-bottom: 0; /* Прибираємо нижній відступ */
+    opacity: 0.8;
+    flex-shrink: 0; /* Запобігає зменшенню тексту */
 }
 
 .boosts {
-    margin-top: auto; /*
+    margin-top: 0; /* Прибираємо верхній відступ */
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 20px;
+    width: 100%;
+    flex-grow: 0; /* Запобігає розтягуванню, дозволяючи space-around працювати */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Центрує кнопки всередині цього блоку */
+    align-items: center; /* Центрує кнопки по горизонталі */
+    padding-bottom: 0; /* Прибираємо будь-який зайвий відступ внизу */
+}
+
+.boosts h2 {
+    font-size: clamp(1.4em, 4vw, 1.8em);
+    margin-top: 0; /* Прибираємо верхній відступ */
+    margin-bottom: 15px; /* Залишаємо відступ між заголовком і першою кнопкою */
+    color: #FFFFFF;
+    flex-shrink: 0; /* Запобігає зменшенню заголовка покращень */
+}
+
+.boosts button {
+    display: block;
+    width: 90%; /* Трохи зменшив ширину кнопок, щоб були відступи від країв контейнера */
+    max-width: 300px; /* Обмежуємо максимальну ширину кнопок */
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: #007bb6;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: clamp(0.9em, 3vw, 1.1em);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+.boosts button:last-child {
+    margin-bottom: 0;
+}
+
+.boosts button:hover {
+    background-color: #005f8f;
+    transform: translateY(-2px);
+}
+
+.boosts button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+/* Медіа-запит для дуже маленьких екранів або великих кнопок */
+@media (max-height: 650px), (max-width: 400px) {
+    .container {
+        padding: 15px; /* Ще більше зменшити padding, якщо екран дуже малий */
+    }
+    .boosts h2 {
+        margin-bottom: 10px;
+    }
+    .boosts button {
+        padding: 10px;
+        margin-bottom: 8px;
+        font-size: clamp(0.8em, 2.5vw, 1em);
+    }
+    .click-area {
+        width: clamp(120px, 45vw, 180px); /* Монетка може бути ще меншою на малих екранах */
+        height: clamp(120px, 45vw, 180px);
+    }
+}
