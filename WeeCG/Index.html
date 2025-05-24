@@ -9,8 +9,10 @@
 <body>
     <div class="container">
         <h1>Твої монети: <span id="score">0</span></h1>
+        <p id="debugUserId" style="font-size: 0.8em; color: rgba(255,255,255,0.6); margin-top: 5px;"></p>
+
         <div class="click-area" id="clickButton">
-            <img src="coin.png" alt="Монета" class="coin-image">
+            <img src="17216520371945142674.jpeg" alt="Монета" class="coin-image">
         </div>
         <p class="instructions">Натискай на монету, щоб заробляти!</p>
 
@@ -28,16 +30,14 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script type="module">
-        // Імпорти для Firebase SDK v9+ (модульний синтаксис)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         // ВАША КОНФІГУРАЦІЯ FIREBASE
-        // (Скопіюйте її з вашого проєкту Firebase, якщо вона відрізняється від цієї)
         const firebaseConfig = {
           apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
           authDomain: "weegamebot-7c44b.firebaseapp.com",
-          databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
+          databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com", // Це для Realtime Database, Firestore використовує інші API
           projectId: "weegamebot-7c44b",
           storageBucket: "weegamebot-7c44b.firebasestorage.app",
           messagingSenderId: "1052981895153",
@@ -45,9 +45,5 @@
         };
 
         // Ініціалізуємо Firebase та Firestore
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // Отримуємо посилання на Cloud Firestore
-    </script>
-    <script type="module" src="script.js"></script>
-</body>
-</html>
+        const app = initializeApp(firebase
+                                  
