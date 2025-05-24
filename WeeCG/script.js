@@ -31,6 +31,7 @@ function checkUpgradeAvailability() {
 // Функція для завантаження даних гравця з Firestore
 async function loadPlayerData() {
     // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
+    // Змінено: тепер db буде window.db завдяки compat SDK
     if (typeof window.db === 'undefined' || !window.db) {
         console.error("Firebase Firestore is not initialized or not accessible (db is undefined).");
         updateScoreDisplay(); // Оновлюємо відображення з початковими значеннями
@@ -46,9 +47,9 @@ async function loadPlayerData() {
 
     try {
         // Отримуємо посилання на документ гравця
-        // Використовуємо глобально доступний об'єкт 'db'
+        // Змінено для сумісної версії
         const docRef = window.db.collection("players").doc(telegramUserId);
-        const docSnap = await docRef.get(); // Завантажуємо документ
+        const docSnap = await docRef.get();
 
         if (docSnap.exists) {
             // Якщо дані гравця знайдені, оновлюємо ігрові змінні
@@ -84,6 +85,7 @@ async function loadPlayerData() {
 // Функція для збереження даних гравця в Firestore
 async function savePlayerData() {
     // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
+    // Змінено: тепер db буде window.db завдяки compat SDK
     if (typeof window.db === 'undefined' || !window.db) {
         console.error("Firebase Firestore is not initialized or not accessible for saving.");
         return;
@@ -96,7 +98,7 @@ async function savePlayerData() {
 
     try {
         // Зберігаємо поточні ігрові дані в Firestore
-        // Використовуємо глобально доступний об'єкт 'db'
+        // Змінено для сумісної версії
         await window.db.collection("players").doc(telegramUserId).set({
             score: score,
             clickPower: clickPower,
@@ -180,6 +182,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Додаємо автоматичне збереження кожні 5 секунд
-    // Це важливо на випадок, якщо користувач просто закриє Web App без взаємодії
     setInterval(savePlayerData, 5000);
 });
