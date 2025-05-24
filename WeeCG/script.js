@@ -16,6 +16,11 @@ let upgrade2Cost = 500;
 let autoClickInterval; // Для зберігання ідентифікатора інтервалу авто-клікера
 let telegramUserId = null; // Змінна для зберігання ID користувача Telegram
 
+// Створення аудіооб'єкта для звуку кліка
+const coinClickSound = new Audio('coin_click.mp3'); // Переконайтеся, що шлях до файлу правильний
+coinClickSound.volume = 0.5; // Можна налаштувати гучність (0.0 - 1.0)
+
+
 // Функція для оновлення відображення очок
 function updateScoreDisplay() {
     scoreElement.textContent = Math.floor(score); // Завжди показуємо цілі числа
@@ -30,27 +35,24 @@ function checkUpgradeAvailability() {
 
 // Функція для завантаження даних гравця з Firestore
 async function loadPlayerData() {
-    // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
     if (typeof window.db === 'undefined' || !window.db) {
         console.error("Firebase Firestore is not initialized or not accessible (db is undefined).");
-        updateScoreDisplay(); // Оновлюємо відображення з початковими значеннями
+        updateScoreDisplay();
         return;
     }
 
     if (!telegramUserId) {
         console.warn("Telegram User ID not available. Running in test mode without saving progress.");
-        telegramUserId = 'test_user_local'; // Для локального тестування без Telegram встановлюємо тестовий ID
-        updateScoreDisplay(); // Оновлюємо відображення з початковими значеннями
+        telegramUserId = 'test_user_local';
+        updateScoreDisplay();
         return;
     }
 
     try {
-        // Отримуємо посилання на документ гравця
         const docRef = window.db.collection("players").doc(telegramUserId);
-        const docSnap = await docRef.get(); // Завантажуємо документ
+        const docSnap = await docRef.get();
 
         if (docSnap.exists) {
-            // Якщо дані гравця знайдені, оновлюємо ігрові змінні
             const data = docSnap.data();
             score = data.score;
             clickPower = data.clickPower;
@@ -58,33 +60,29 @@ async function loadPlayerData() {
             upgrade1Cost = data.upgrade1Cost;
             upgrade2Cost = data.upgrade2Cost;
 
-            // !!! ДОДАНО: ОНОВЛЕННЯ ВІДОБРАЖЕННЯ ВАРТОСТІ ПОКРАЩЕНЬ ПРИ ЗАВАНТАЖЕННІ !!!
+            // ОНОВЛЕННЯ ВІДОБРАЖЕННЯ ВАРТОСТІ ПОКРАЩЕНЬ ПРИ ЗАВАНТАЖЕННІ
             upgrade1CostElement.textContent = upgrade1Cost;
             upgrade2CostElement.textContent = upgrade2Cost;
-            // !!! КІНЕЦЬ ДОДАНИХ РЯДКІВ !!!
 
-            // Якщо авто-клікер був активний, перезапускаємо його
             if (autoClickPower > 0) {
                 if (autoClickInterval) {
-                    clearInterval(autoClickInterval); // Зупиняємо попередній, якщо був
+                    clearInterval(autoClickInterval);
                 }
                 autoClickInterval = setInterval(() => {
                     score += autoClickPower;
                     updateScoreDisplay();
-                    savePlayerData(); // Автоматичне збереження
-                }, 1000); // Кожні 1000 мс (1 секунда)
+                    savePlayerData();
+                }, 1000);
             }
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
-            // Якщо даних немає, гра почнеться з початкових значень (що вже є в змінних)
             // Ініціалізуємо відображення вартості покращень на початкові значення
             upgrade1CostElement.textContent = upgrade1Cost;
             upgrade2CostElement.textContent = upgrade2Cost;
         }
-        updateScoreDisplay(); // Оновлюємо відображення після завантаження/ініціалізації
+        updateScoreDisplay();
     } catch (error) {
         console.error('Error loading player data:', error);
-        // Якщо сталася помилка завантаження, гра почнеться з нуля
         // Ініціалізуємо відображення вартості покращень на початкові значення
         upgrade1CostElement.textContent = upgrade1Cost;
         upgrade2CostElement.textContent = upgrade2Cost;
@@ -123,6 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
         tg.ready();
+        // ДОДАНО: Розширення Web App на весь екран
+        tg.expand(); // Це повинно розгорнути додаток на повну висоту
+
         if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
             telegramUserId = tg.initDataUnsafe.user.id.toString();
             console.log("Telegram User ID:", telegramUserId);
@@ -142,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    loadPlayerData(); // ЗАВАНТАЖУЄМО дані гравця при старті гри
+    loadPlayerData();
 
     // Обробник кліка по монеті
     clickButton.addEventListener('click', () => {
@@ -150,6 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
         score += clickPower;
         updateScoreDisplay();
         savePlayerData();
+        // Відтворення звуку при кліку
+        coinClickSound.currentTime = 0;
+        coinClickSound.play().catch(e => console.error("Error playing sound:", e));
     });
 
     // Покращення 1: Більше монет за клік
@@ -158,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade1Cost;
             clickPower += 1;
             upgrade1Cost = Math.floor(upgrade1Cost * 1.5);
-            upgrade1CostElement.textContent = upgrade1Cost; // Оновлення відображення
+            upgrade1CostElement.textContent = upgrade1Cost;
             updateScoreDisplay();
             savePlayerData();
         }
@@ -170,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade2Cost;
             autoClickPower += 1;
             upgrade2Cost = Math.floor(upgrade2Cost * 2);
-            upgrade2CostElement.textContent = upgrade2Cost; // Оновлення відображення
+            upgrade2CostElement.textContent = upgrade2Cost;
             updateScoreDisplay();
             savePlayerData();
 
