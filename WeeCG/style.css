@@ -59,7 +59,13 @@ h1 {
 
 .click-area:active {
     transform: scale(0.95);
+    outline: none; /* !!! ДОДАНО: Прибираємо стандартний outline при натисканні !!! */
 }
+
+.click-area:focus {
+    outline: none; /* Може бути корисним для прибирання фокусу клавіатури */
+}
+
 
 .coin-image {
     width: 100%;
