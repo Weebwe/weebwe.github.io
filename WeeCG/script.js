@@ -31,7 +31,6 @@ function checkUpgradeAvailability() {
 // Функція для завантаження даних гравця з Firestore
 async function loadPlayerData() {
     // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
-    // Змінено: тепер db буде window.db завдяки compat SDK
     if (typeof window.db === 'undefined' || !window.db) {
         console.error("Firebase Firestore is not initialized or not accessible (db is undefined).");
         updateScoreDisplay(); // Оновлюємо відображення з початковими значеннями
@@ -47,9 +46,8 @@ async function loadPlayerData() {
 
     try {
         // Отримуємо посилання на документ гравця
-        // Змінено для сумісної версії
         const docRef = window.db.collection("players").doc(telegramUserId);
-        const docSnap = await docRef.get();
+        const docSnap = await docRef.get(); // Завантажуємо документ
 
         if (docSnap.exists) {
             // Якщо дані гравця знайдені, оновлюємо ігрові змінні
@@ -59,6 +57,11 @@ async function loadPlayerData() {
             autoClickPower = data.autoClickPower;
             upgrade1Cost = data.upgrade1Cost;
             upgrade2Cost = data.upgrade2Cost;
+
+            // !!! ДОДАНО: ОНОВЛЕННЯ ВІДОБРАЖЕННЯ ВАРТОСТІ ПОКРАЩЕНЬ ПРИ ЗАВАНТАЖЕННІ !!!
+            upgrade1CostElement.textContent = upgrade1Cost;
+            upgrade2CostElement.textContent = upgrade2Cost;
+            // !!! КІНЕЦЬ ДОДАНИХ РЯДКІВ !!!
 
             // Якщо авто-клікер був активний, перезапускаємо його
             if (autoClickPower > 0) {
@@ -73,19 +76,23 @@ async function loadPlayerData() {
             }
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
-            // Якщо даних немає, гра почнеться з початкових значень
+            // Якщо даних немає, гра почнеться з початкових значень (що вже є в змінних)
+            // Ініціалізуємо відображення вартості покращень на початкові значення
+            upgrade1CostElement.textContent = upgrade1Cost;
+            upgrade2CostElement.textContent = upgrade2Cost;
         }
         updateScoreDisplay(); // Оновлюємо відображення після завантаження/ініціалізації
     } catch (error) {
         console.error('Error loading player data:', error);
         // Якщо сталася помилка завантаження, гра почнеться з нуля
+        // Ініціалізуємо відображення вартості покращень на початкові значення
+        upgrade1CostElement.textContent = upgrade1Cost;
+        upgrade2CostElement.textContent = upgrade2Cost;
     }
 }
 
 // Функція для збереження даних гравця в Firestore
 async function savePlayerData() {
-    // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
-    // Змінено: тепер db буде window.db завдяки compat SDK
     if (typeof window.db === 'undefined' || !window.db) {
         console.error("Firebase Firestore is not initialized or not accessible for saving.");
         return;
@@ -97,8 +104,6 @@ async function savePlayerData() {
     }
 
     try {
-        // Зберігаємо поточні ігрові дані в Firestore
-        // Змінено для сумісної версії
         await window.db.collection("players").doc(telegramUserId).set({
             score: score,
             clickPower: clickPower,
@@ -117,9 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ініціалізація Telegram Web App API та отримання ID користувача
     if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
-        tg.ready(); // Повідомляємо Telegram, що Web App готовий
+        tg.ready();
         if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
-            telegramUserId = tg.initDataUnsafe.user.id.toString(); // ID має бути string для Firebase
+            telegramUserId = tg.initDataUnsafe.user.id.toString();
             console.log("Telegram User ID:", telegramUserId);
             if (debugUserIdElement) {
                 debugUserIdElement.textContent = "ID: " + telegramUserId;
@@ -141,10 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Обробник кліка по монеті
     clickButton.addEventListener('click', () => {
-        console.log("Coin clicked!"); // Вивід у консоль при кліку
+        console.log("Coin clicked!");
         score += clickPower;
         updateScoreDisplay();
-        savePlayerData(); // Зберігаємо після кожного кліка
+        savePlayerData();
     });
 
     // Покращення 1: Більше монет за клік
@@ -153,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade1Cost;
             clickPower += 1;
             upgrade1Cost = Math.floor(upgrade1Cost * 1.5);
-            upgrade1CostElement.textContent = upgrade1Cost;
+            upgrade1CostElement.textContent = upgrade1Cost; // Оновлення відображення
             updateScoreDisplay();
-            savePlayerData(); // Зберігаємо після покупки
+            savePlayerData();
         }
     });
 
@@ -165,18 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade2Cost;
             autoClickPower += 1;
             upgrade2Cost = Math.floor(upgrade2Cost * 2);
-            upgrade2CostElement.textContent = upgrade2Cost;
+            upgrade2CostElement.textContent = upgrade2Cost; // Оновлення відображення
             updateScoreDisplay();
-            savePlayerData(); // Зберігаємо після покупки
+            savePlayerData();
 
-            // Запускаємо або оновлюємо інтервал авто-клікера
             if (autoClickInterval) {
                 clearInterval(autoClickInterval);
             }
             autoClickInterval = setInterval(() => {
                 score += autoClickPower;
                 updateScoreDisplay();
-                savePlayerData(); // Автоматичне збереження від авто-клікера
+                savePlayerData();
             }, 1000);
         }
     });
