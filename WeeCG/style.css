@@ -16,12 +16,12 @@ body {
 .container {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для контейнера */
-    padding: 20px; /* Внутрішні відступи контейнера */
+    padding: 0px; /* Внутрішні відступи контейнера */
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     max-width: 400px; /* Обмежуємо максимальну ширину для великих екранів */
     width: 95%; /* Займає 95% ширини екрану */
-    height: 95vh; /* Займає 95% висоти viewport */
+    height: 95%; /* Займає 95% висоти viewport */
     display: flex;
     flex-direction: column;
     justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
