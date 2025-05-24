@@ -1,0 +1,104 @@
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #0094FE; /* Ваш корпоративний колір */
+    color: #FFFFFF; /* Білий - Ваш корпоративний колір */
+    overflow: hidden; /* Щоб уникнути скролу на мобільних пристроях */
+}
+
+.container {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для контейнера */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    width: 400px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #FFFFFF;
+}
+
+#score {
+    font-weight: bold;
+}
+
+.click-area {
+    width: 200px;
+    height: 200px;
+    /* Background-color можна прибрати, якщо монета повністю закриває коло */
+    /* background-color: #fdd835; */
+    border-radius: 50%;
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.1s ease-out;
+    border: 5px solid rgba(255, 255, 255, 0.5); /* Додаємо рамку для візуального акценту */
+    overflow: hidden; /* Обрізаємо зображення по кругу */
+}
+
+.click-area:active {
+    transform: scale(0.95); /* Ефект натискання */
+}
+
+.coin-image {
+    width: 100%; /* Зображення заповнює всю область */
+    height: 100%; /* Зображення заповнює всю область */
+    object-fit: contain; /* Зберігає пропорції, вміщаючи зображення в контейнер */
+    display: block; /* Видаляємо зайві відступи */
+}
+
+.instructions {
+    font-size: 1.1em;
+    margin-top: 20px;
+    opacity: 0.8;
+}
+
+.boosts {
+    margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 20px;
+}
+
+.boosts h2 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #FFFFFF;
+}
+
+.boosts button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #007bb6; /* Темніший відтінок синього */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.boosts button:hover {
+    background-color: #005f8f;
+    transform: translateY(-2px);
+}
+
+.boosts button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
