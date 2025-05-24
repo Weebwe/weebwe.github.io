@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мій Клікер</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Твої монети: <span id="score">0</span></h1>
+        <div class="click-area" id="clickButton">
+            <img src="coin.png" alt="Монета" class="coin-image">
+        </div>
+        <p class="instructions">Натискай на монету, щоб заробляти!</p>
+
+        <div class="boosts">
+            <h2>Покращення</h2>
+            <button id="upgrade1">
+                Більше монет за клік (+1) - Коштує: <span id="upgrade1Cost">100</span> монет
+            </button>
+            <button id="upgrade2">
+                Авто-клікер (+1 монета/сек) - Коштує: <span id="upgrade2Cost">500</span> монет
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
