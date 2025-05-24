@@ -4,7 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мій Клікер</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS КОД (для адаптивного відображення, щоб все влізло) */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Забезпечує, що body займає всю висоту вікна */
+            margin: 0;
+            background-color: #0094FE; /* Ваш корпоративний колір */
+            color: #FFFFFF; /* Білий - Ваш корпоративний колір */
+            overflow: hidden; /* Забороняє прокрутку всього body */
+            padding: 10px; /* Невеликий відступ від країв екрану */
+            box-sizing: border-box; /* Враховує padding у загальному розмірі елемента */
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для контейнера */
+            padding: 20px; /* Внутрішні відступи контейнера */
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 400px; /* Обмежуємо максимальну ширину для великих екранів */
+            width: 95%; /* Займає 95% ширини екрану */
+            height: 95vh; /* Займає 95% висоти viewport */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: clamp(1.5em, 5vw, 2.5em); /* Адаптивний розмір шрифту */
+            margin-top: 0; /* Прибираємо верхній відступ, так як space-around його компенсує */
+            margin-bottom: 0; /* Прибираємо нижній відступ */
+            color: #FFFFFF;
+            flex-shrink: 0; /* Запобігає зменшенню заголовка */
+        }
+
+        #score {
+            font-weight: bold;
+        }
+
+        .click-area {
+            width: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
+            height: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
+            border-radius: 50%;
+            margin: 0; /* Прибираємо зовнішні відступи, так як space-around їх компенсує */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.1s ease-out;
+            border: 5px solid rgba(255, 255, 255, 0.5);
+            overflow: hidden;
+            flex-shrink: 0; /* Запобігає зменшенню розміру монети */
+        }
+
+        .click-area:active {
+            transform: scale(0.95);
+        }
+
+        .coin-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .instructions {
+            font-size: clamp(0.9em, 2.5vw, 1.1em);
+            margin-top: 0; /* Прибираємо верхній відступ */
+            margin-bottom: 0; /* Прибираємо нижній відступ */
+            opacity: 0.8;
+            flex-shrink: 0; /* Запобігає зменшенню тексту */
+        }
+
+        .boosts {
+            margin-top: 0; /* Прибираємо верхній відступ */
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 20px;
+            width: 100%;
+            flex-grow: 0; /* Запобігає розтягуванню, дозволяючи space-around працювати */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Центрує кнопки всередині цього блоку */
+            align-items: center; /* Центрує кнопки по горизонталі */
+            padding-bottom: 0; /* Прибираємо будь-який зайвий відступ внизу */
+        }
+
+        .boosts h2 {
+            font-size: clamp(1.4em, 4vw, 1.8em);
+            margin-top: 0; /* Прибираємо верхній відступ */
+            margin-bottom: 15px; /* Залишаємо відступ між заголовком і першою кнопкою */
+            color: #FFFFFF;
+            flex-shrink: 0; /* Запобігає зменшенню заголовка покращень */
+        }
+
+        .boosts button {
+            display: block;
+            width: 90%; /* Трохи зменшив ширину кнопок, щоб були відступи від країв контейнера */
+            max-width: 300px; /* Обмежуємо максимальну ширину кнопок */
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: #007bb6;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(0.9em, 3vw, 1.1em);
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .boosts button:last-child {
+            margin-bottom: 0;
+        }
+
+        .boosts button:hover {
+            background-color: #005f8f;
+            transform: translateY(-2px);
+        }
+
+        .boosts button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        /* Медіа-запит для дуже маленьких екранів або великих кнопок */
+        @media (max-height: 650px), (max-width: 400px) {
+            .container {
+                padding: 15px;
+            }
+            .boosts h2 {
+                margin-bottom: 10px;
+            }
+            .boosts button {
+                padding: 10px;
+                margin-bottom: 8px;
+                font-size: clamp(0.8em, 2.5vw, 1em);
+            }
+            .click-area {
+                width: clamp(120px, 45vw, 180px);
+                height: clamp(120px, 45vw, 180px);
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -25,6 +176,50 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script type="module">
+        // Імпорти для Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // Ваша конфігурація Firebase (Скопійована з вашого проєкту Firebase)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
+          authDomain: "weegamebot-7c44b.firebaseapp.com",
+          databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com", // Це для Realtime Database, Firestore використовує інші API
+          projectId: "weegamebot-7c44b",
+          storageBucket: "weegamebot-7c44b.firebasestorage.app",
+          messagingSenderId: "1052981895153",
+          appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
+        };
+
+        // Ініціалізуємо Firebase та Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Отримуємо посилання на Cloud Firestore
+
+        // --- ВЕСЬ ВАШ JavaScript КОД ПОЧИНАЄТЬСЯ ТУТ ---
+
+        const scoreElement = document.getElementById('score');
+        const clickButton = document.getElementById('clickButton');
+        const upgrade1Button = document.getElementById('upgrade1');
+        const upgrade1CostElement = document.getElementById('upgrade1Cost');
+        const upgrade2Button = document.getElementById('upgrade2');
+        const upgrade2CostElement = document.getElementById('upgrade2Cost');
+
+        let score = 0;
+        let clickPower = 1; // Скільки монет за один клік
+        let autoClickPower = 0; // Скільки монет за секунду від авто-клікера
+        let upgrade1Cost = 100;
+        let upgrade2Cost = 500;
+        let autoClickInterval; // Для зберігання інтервалу авто-клікера
+        let telegramUserId = null; // Змінна для зберігання ID користувача Telegram
+
+        // Функція для оновлення відображення очок
+        function updateScoreDisplay() {
+            scoreElement.textContent = Math.floor(score); // Завжди показуємо цілі числа
+            checkUpgradeAvailability();
+        }
+
+        // Функція для перевірки доступності покращень
+        
