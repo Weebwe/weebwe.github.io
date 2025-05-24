@@ -1,3 +1,4 @@
+/* CSS КОД ДЛЯ АДАПТИВНОГО ВІДОБРАЖЕННЯ В TELEGRAM MINI APP */
 body {
     font-family: 'Arial', sans-serif;
     display: flex;
@@ -5,8 +6,8 @@ body {
     align-items: center;
     min-height: 100vh; /* Забезпечує, що body займає всю висоту вікна */
     margin: 0;
-    background-color: #0094FE; /* Ваш корпоративний колір */
-    color: #FFFFFF; /* Білий - Ваш корпоративний колір */
+    background-color: #0094FE; /* Ваш корпоративний колір: #0094FE */
+    color: #FFFFFF; /* Ваш корпоративний колір: Білий */
     overflow: hidden; /* Забороняє прокрутку всього body */
     padding: 10px; /* Невеликий відступ від країв екрану */
     box-sizing: border-box; /* Враховує padding у загальному розмірі елемента */
@@ -23,7 +24,6 @@ body {
     height: 95vh; /* Займає 95% висоти viewport */
     display: flex;
     flex-direction: column;
-    /* Змінено: space-around замість space-between для більш рівномірного розподілу */
     justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
     align-items: center;
     box-sizing: border-box;
@@ -133,7 +133,7 @@ h1 {
 /* Медіа-запит для дуже маленьких екранів або великих кнопок */
 @media (max-height: 650px), (max-width: 400px) {
     .container {
-        padding: 15px; /* Ще більше зменшити padding, якщо екран дуже малий */
+        padding: 15px;
     }
     .boosts h2 {
         margin-bottom: 10px;
@@ -144,7 +144,7 @@ h1 {
         font-size: clamp(0.8em, 2.5vw, 1em);
     }
     .click-area {
-        width: clamp(120px, 45vw, 180px); /* Монетка може бути ще меншою на малих екранах */
+        width: clamp(120px, 45vw, 180px);
         height: clamp(120px, 45vw, 180px);
     }
 }
