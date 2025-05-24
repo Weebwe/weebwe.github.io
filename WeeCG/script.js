@@ -1,11 +1,3 @@
-// Імпорти для Firebase SDK v9+ (модульний синтаксис)
-// Примітка: ці імпорти тепер не потрібні безпосередньо тут,
-// оскільки ми передаємо 'db' та 'app' через глобальні змінні з index.html.
-// Але для TypeScript або якщо ви будуєте проект за допомогою bundler, вони потрібні.
-// import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-
-// --- ПОЧАТОК ЛОГІКИ ГРИ НА JAVASCRIPT ---
-
 // Отримання посилань на HTML-елементи
 const scoreElement = document.getElementById('score');
 const clickButton = document.getElementById('clickButton');
@@ -13,6 +5,7 @@ const upgrade1Button = document.getElementById('upgrade1');
 const upgrade1CostElement = document.getElementById('upgrade1Cost');
 const upgrade2Button = document.getElementById('upgrade2');
 const upgrade2CostElement = document.getElementById('upgrade2Cost');
+const debugUserIdElement = document.getElementById('debugUserId'); // Для відображення ID
 
 // Ігрові змінні (початкові значення)
 let score = 0;
@@ -38,9 +31,8 @@ function checkUpgradeAvailability() {
 // Функція для завантаження даних гравця з Firestore
 async function loadPlayerData() {
     // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
-    if (typeof db === 'undefined' || !db) {
-        console.error("Firebase Firestore is not initialized or not accessible.");
-        // Якщо Firestore не доступний, гра працюватиме без збереження
+    if (typeof window.db === 'undefined' || !window.db) {
+        console.error("Firebase Firestore is not initialized or not accessible (db is undefined).");
         updateScoreDisplay(); // Оновлюємо відображення з початковими значеннями
         return;
     }
@@ -54,11 +46,11 @@ async function loadPlayerData() {
 
     try {
         // Отримуємо посилання на документ гравця
-        // Використовуємо глобально доступні функції Firebase
-        const docRef = firebase.firestore().collection("players").doc(telegramUserId); // <--- Змінено тут
+        // Використовуємо глобально доступний об'єкт 'db'
+        const docRef = window.db.collection("players").doc(telegramUserId);
         const docSnap = await docRef.get(); // Завантажуємо документ
 
-        if (docSnap.exists) { // Змінено: docSnap.exists()
+        if (docSnap.exists) {
             // Якщо дані гравця знайдені, оновлюємо ігрові змінні
             const data = docSnap.data();
             score = data.score;
@@ -92,20 +84,20 @@ async function loadPlayerData() {
 // Функція для збереження даних гравця в Firestore
 async function savePlayerData() {
     // Перевіряємо, чи доступний 'db' (екземпляр Firestore)
-    if (typeof db === 'undefined' || !db) {
+    if (typeof window.db === 'undefined' || !window.db) {
         console.error("Firebase Firestore is not initialized or not accessible for saving.");
         return;
     }
 
-    if (!telegramUserId) {
-        console.warn("Cannot save data: Telegram User ID not available.");
+    if (!telegramUserId || telegramUserId === 'test_user_local') {
+        console.warn("Cannot save data: Telegram User ID is not available or is a test ID.");
         return;
     }
 
     try {
         // Зберігаємо поточні ігрові дані в Firestore
-        // Використовуємо глобально доступні функції Firebase
-        await firebase.firestore().collection("players").doc(telegramUserId).set({ // <--- Змінено тут
+        // Використовуємо глобально доступний об'єкт 'db'
+        await window.db.collection("players").doc(telegramUserId).set({
             score: score,
             clickPower: clickPower,
             autoClickPower: autoClickPower,
@@ -127,12 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
             telegramUserId = tg.initDataUnsafe.user.id.toString(); // ID має бути string для Firebase
             console.log("Telegram User ID:", telegramUserId);
+            if (debugUserIdElement) {
+                debugUserIdElement.textContent = "ID: " + telegramUserId;
+            }
         } else {
             console.warn("Telegram User ID not available (tg.initDataUnsafe.user.id is missing).");
-            // Це може статися при локальному тестуванні або якщо Telegram не передав дані
+            if (debugUserIdElement) {
+                debugUserIdElement.textContent = "ID: Недоступний (тест)";
+            }
         }
     } else {
         console.warn("Telegram Web App API not found. Please open in Telegram to get user ID.");
+        if (debugUserIdElement) {
+            debugUserIdElement.textContent = "ID: API Telegram не знайдено";
+        }
     }
 
     loadPlayerData(); // ЗАВАНТАЖУЄМО дані гравця при старті гри
@@ -183,5 +183,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Це важливо на випадок, якщо користувач просто закриє Web App без взаємодії
     setInterval(savePlayerData, 5000);
 });
-
-// --- КІНЕЦЬ ЛОГІКИ ГРИ НА JAVASCRIPT ---
