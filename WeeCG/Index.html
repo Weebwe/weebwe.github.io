@@ -29,21 +29,28 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
+    <script>
         // ВАША КОНФІГУРАЦІЯ FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
           authDomain: "weegamebot-7c44b.firebaseapp.com",
-          databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com", // Це для Realtime Database, Firestore використовує інші API
+          databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
           projectId: "weegamebot-7c44b",
           storageBucket: "weegamebot-7c44b.firebasestorage.app",
           messagingSenderId: "1052981895153",
           appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
         };
 
-        // Ініціалізуємо Firebase та Firestore
-        const app = initializeApp(firebase
-                                  
+        // Ініціалізуємо Firebase
+        firebase.initializeApp(firebaseConfig);
+        // Отримуємо екземпляр Firestore і робимо його глобально доступним
+        window.db = firebase.firestore(); // !!! Змінено на firebase.firestore() !!!
+        console.log("Firebase initialized (compat version) and Firestore 'db' is global.");
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
