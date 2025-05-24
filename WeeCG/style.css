@@ -1,40 +1,49 @@
 /* CSS КОД ДЛЯ АДАПТИВНОГО ВІДОБРАЖЕННЯ В TELEGRAM MINI APP */
+
+/* Додаємо ці правила, щоб html та body займали весь доступний простір */
+html, body {
+    width: 100%;
+    height: 100%; /* Гарантуємо, що html і body займають 100% висоти */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Запобігаємо прокрутці на рівні html/body */
+}
+
 body {
     font-family: 'Arial', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh; /* Забезпечує, що body займає всю висоту вікна */
-    margin: 0;
     background-color: #0094FE; /* Ваш корпоративний колір: #0094FE */
     color: #FFFFFF; /* Ваш корпоративний колір: Білий */
-    overflow: hidden; /* Забороняє прокрутку всього body */
-    padding: 10px; /* Невеликий відступ від країв екрану */
-    box-sizing: border-box; /* Враховує padding у загальному розмірі елемента */
+    padding: 0; /* Прибираємо зовнішній padding на body */
+    box-sizing: border-box;
 }
 
 .container {
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для контейнера */
-    padding: 0px; /* Внутрішні відступи контейнера */
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 20px; /* Внутрішні відступи контейнера */
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     max-width: 400px; /* Обмежуємо максимальну ширину для великих екранів */
-    width: 95%; /* Займає 95% ширини екрану */
-    height: 95%; /* Займає 95% висоти viewport */
+    width: 100%; /* Займає 100% ширини батьківського елемента */
+    height: 100%; /* Займає 100% висоти батьківського елемента */
     display: flex;
     flex-direction: column;
     justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
     align-items: center;
     box-sizing: border-box;
+    margin: auto;
 }
 
 h1 {
-    font-size: clamp(1.5em, 5vw, 2.5em); /* Адаптивний розмір шрифту */
-    margin-top: 0; /* Прибираємо верхній відступ, так як space-around його компенсує */
-    margin-bottom: 0; /* Прибираємо нижній відступ */
+    font-size: clamp(1.5em, 5vw, 2.5em);
+    margin-top: 0;
+    margin-bottom: 0;
     color: #FFFFFF;
-    flex-shrink: 0; /* Запобігає зменшенню заголовка */
+    flex-shrink: 0;
 }
 
 #score {
@@ -42,10 +51,11 @@ h1 {
 }
 
 .click-area {
-    width: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
-    height: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
+    /* ЗМІНЕНО: Збільшуємо розмір монети, щоб вона займала більше місця */
+    width: clamp(200px, 70vw, 300px); /* Було 150px, 50vw, 200px */
+    height: clamp(200px, 70vw, 300px); /* Було 150px, 50vw, 200px */
     border-radius: 50%;
-    margin: 0; /* Прибираємо зовнішні відступи, так як space-around їх компенсує */
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -54,18 +64,17 @@ h1 {
     transition: transform 0.1s ease-out;
     border: 5px solid rgba(255, 255, 255, 0.5);
     overflow: hidden;
-    flex-shrink: 0; /* Запобігає зменшенню розміру монети */
+    flex-shrink: 0;
 }
 
 .click-area:active {
     transform: scale(0.95);
-    outline: none; /* !!! ДОДАНО: Прибираємо стандартний outline при натисканні !!! */
+    outline: none;
 }
 
 .click-area:focus {
-    outline: none; /* Може бути корисним для прибирання фокусу клавіатури */
+    outline: none;
 }
-
 
 .coin-image {
     width: 100%;
@@ -76,37 +85,37 @@ h1 {
 
 .instructions {
     font-size: clamp(0.9em, 2.5vw, 1.1em);
-    margin-top: 0; /* Прибираємо верхній відступ */
-    margin-bottom: 0; /* Прибираємо нижній відступ */
+    margin-top: 0;
+    margin-bottom: 0;
     opacity: 0.8;
-    flex-shrink: 0; /* Запобігає зменшенню тексту */
+    flex-shrink: 0;
 }
 
 .boosts {
-    margin-top: 0; /* Прибираємо верхній відступ */
+    margin-top: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     padding-top: 20px;
     width: 100%;
-    flex-grow: 0; /* Запобігає розтягуванню, дозволяючи space-around працювати */
+    flex-grow: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Центрує кнопки всередині цього блоку */
-    align-items: center; /* Центрує кнопки по горизонталі */
-    padding-bottom: 0; /* Прибираємо будь-який зайвий відступ внизу */
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 0;
 }
 
 .boosts h2 {
     font-size: clamp(1.4em, 4vw, 1.8em);
-    margin-top: 0; /* Прибираємо верхній відступ */
-    margin-bottom: 15px; /* Залишаємо відступ між заголовком і першою кнопкою */
+    margin-top: 0;
+    margin-bottom: 15px;
     color: #FFFFFF;
-    flex-shrink: 0; /* Запобігає зменшенню заголовка покращень */
+    flex-shrink: 0;
 }
 
 .boosts button {
     display: block;
-    width: 90%; /* Трохи зменшив ширину кнопок, щоб були відступи від країв контейнера */
-    max-width: 300px; /* Обмежуємо максимальну ширину кнопок */
+    width: 90%;
+    max-width: 300px;
     padding: 12px;
     margin-bottom: 10px;
     background-color: #007bb6;
@@ -150,7 +159,8 @@ h1 {
         font-size: clamp(0.8em, 2.5vw, 1em);
     }
     .click-area {
-        width: clamp(120px, 45vw, 180px);
-        height: clamp(120px, 45vw, 180px);
+        /* ЗМІНЕНО: Регулюємо розмір монети для маленьких екранів */
+        width: clamp(150px, 60vw, 250px); /* Було 120px, 45vw, 180px */
+        height: clamp(150px, 60vw, 250px); /* Було 120px, 45vw, 180px */
     }
 }
