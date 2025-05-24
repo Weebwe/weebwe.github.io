@@ -222,4 +222,138 @@
         }
 
         // Функція для перевірки доступності покращень
-        
+        function checkUpgradeAvailability() {
+            upgrade1Button.disabled = score < upgrade1Cost;
+            upgrade2Button.disabled = score < upgrade2Cost;
+        }
+
+        // Функція для завантаження даних гравця
+        async function loadPlayerData() {
+            if (!telegramUserId) {
+                console.warn("Telegram User ID not available. Running in test mode without saving progress.");
+                telegramUserId = 'test_user_local'; // Для локального тестування без Telegram встановлюємо тестовий ID
+                updateScoreDisplay(); // Оновлюємо відображення з початковими значеннями
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "players", telegramUserId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    score = data.score;
+                    clickPower = data.clickPower;
+                    autoClickPower = data.autoClickPower;
+                    upgrade1Cost = data.upgrade1Cost;
+                    upgrade2Cost = data.upgrade2Cost;
+
+                    // Якщо авто-клікер був активний, перезапускаємо його
+                    if (autoClickPower > 0) {
+                        if (autoClickInterval) {
+                            clearInterval(autoClickInterval);
+                        }
+                        autoClickInterval = setInterval(() => {
+                            score += autoClickPower;
+                            updateScoreDisplay();
+                            savePlayerData(); // Зберігаємо автоматично
+                        }, 1000);
+                    }
+                } else {
+                    console.log("No player data found for", telegramUserId, ". Starting new game.");
+                    // Якщо даних немає, Firebase залишить поточні початкові значення
+                }
+                updateScoreDisplay(); // Оновлюємо відображення після завантаження/ініціалізації
+            } catch (error) {
+                console.error('Error loading player data:', error);
+                // Якщо помилка завантаження, гра почнеться з нуля
+            }
+        }
+
+        // Функція для збереження даних гравця
+        async function savePlayerData() {
+            if (!telegramUserId) {
+                console.warn("Cannot save data: Telegram User ID not available.");
+                return;
+            }
+
+            try {
+                // Вказуємо колекцію "players" і документ з ID користувача
+                await setDoc(doc(db, "players", telegramUserId), {
+                    score: score,
+                    clickPower: clickPower,
+                    autoClickPower: autoClickPower,
+                    upgrade1Cost: upgrade1Cost,
+                    upgrade2Cost: upgrade2Cost
+                });
+                console.log('Player data saved for', telegramUserId);
+            } catch (error) {
+                console.error('Error saving player data:', error);
+            }
+        }
+
+        // ----- DOMContentLoaded: запускається, коли HTML завантажено -----
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ініціалізація Telegram Web App API та отримання ID
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                    telegramUserId = tg.initDataUnsafe.user.id.toString(); // ID має бути string
+                    console.log("Telegram User ID:", telegramUserId);
+                } else {
+                    console.warn("Telegram User ID not available (tg.initDataUnsafe.user.id is missing).");
+                }
+            } else {
+                console.warn("Telegram Web App API not found.");
+            }
+
+            loadPlayerData(); // ЗАВАНТАЖУЄМО дані при старті гри
+
+            // Обробник кліка по монеті
+            clickButton.addEventListener('click', () => {
+                score += clickPower;
+                updateScoreDisplay();
+                savePlayerData(); // Зберігаємо після кожного кліка
+            });
+
+            // Покращення 1: Більше монет за клік
+            upgrade1Button.addEventListener('click', () => {
+                if (score >= upgrade1Cost) {
+                    score -= upgrade1Cost;
+                    clickPower += 1;
+                    upgrade1Cost = Math.floor(upgrade1Cost * 1.5);
+                    upgrade1CostElement.textContent = upgrade1Cost;
+                    updateScoreDisplay();
+                    savePlayerData(); // Зберігаємо після покупки
+                }
+            });
+
+            // Покращення 2: Авто-клікер
+            upgrade2Button.addEventListener('click', () => {
+                if (score >= upgrade2Cost) {
+                    score -= upgrade2Cost;
+                    autoClickPower += 1;
+                    upgrade2Cost = Math.floor(upgrade2Cost * 2);
+                    upgrade2CostElement.textContent = upgrade2Cost;
+                    updateScoreDisplay();
+                    savePlayerData(); // Зберігаємо після покупки
+
+                    if (autoClickInterval) {
+                        clearInterval(autoClickInterval);
+                    }
+                    autoClickInterval = setInterval(() => {
+                        score += autoClickPower;
+                        updateScoreDisplay();
+                        savePlayerData(); // Автоматичне збереження від авто-клікера
+                    }, 1000);
+                }
+            });
+
+            // Додаємо автоматичне збереження кожні 5 секунд на випадок, якщо користувач просто закриє гру
+            setInterval(savePlayerData, 5000); // Зберігаємо дані кожні 5 секунд
+        });
+
+    </script>
+</body>
+</html>
