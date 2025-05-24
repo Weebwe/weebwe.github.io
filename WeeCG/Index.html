@@ -4,60 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мій Клікер</title>
-    <style>
-        /* CSS КОД ДЛЯ АДАПТИВНОГО ВІДОБРАЖЕННЯ В TELEGRAM MINI APP */
-        body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* Забезпечує, що body займає всю висоту вікна */
-            margin: 0;
-            background-color: #0094FE; /* Ваш корпоративний колір: #0094FE */
-            color: #FFFFFF; /* Ваш корпоративний колір: Білий */
-            overflow: hidden; /* Забороняє прокрутку всього body */
-            padding: 10px; /* Невеликий відступ від країв екрану */
-            box-sizing: border-box; /* Враховує padding у загальному розмірі елемента */
-        }
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Твої монети: <span id="score">0</span></h1>
+        <div class="click-area" id="clickButton">
+            <img src="coin.png" alt="Монета" class="coin-image">
+        </div>
+        <p class="instructions">Натискай на монету, щоб заробляти!</p>
 
-        .container {
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для контейнера */
-            padding: 20px; /* Внутрішні відступи контейнера */
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            max-width: 400px; /* Обмежуємо максимальну ширину для великих екранів */
-            width: 95%; /* Займає 95% ширини екрану */
-            height: 95vh; /* Займає 95% висоти viewport */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
-            align-items: center;
-            box-sizing: border-box;
-        }
+        <div class="boosts">
+            <h2>Покращення</h2>
+            <button id="upgrade1">
+                Більше монет за клік (+1) - Коштує: <span id="upgrade1Cost">100</span> монет
+            </button>
+            <button id="upgrade2">
+                Авто-клікер (+1 монета/сек) - Коштує: <span id="upgrade2Cost">500</span> монет
+            </button>
+        </div>
+    </div>
 
-        h1 {
-            font-size: clamp(1.5em, 5vw, 2.5em); /* Адаптивний розмір шрифту */
-            margin-top: 0; /* Прибираємо верхній відступ, так як space-around його компенсує */
-            margin-bottom: 0; /* Прибираємо нижній відступ */
-            color: #FFFFFF;
-            flex-shrink: 0; /* Запобігає зменшенню заголовка */
-        }
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        #score {
-            font-weight: bold;
-        }
+    <script type="module">
+        // Імпорти для Firebase SDK v9+ (модульний синтаксис)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        .click-area {
-            width: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
-            height: clamp(150px, 50vw, 200px); /* Адаптивний розмір монети */
-            border-radius: 50%;
-            margin: 0; /* Прибираємо зовнішні відступи, так як space-around їх компенсує */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-            transition: transform 0.1s ease-out;
-            border: 5px solid rgba(
-                
+        // ВАША КОНФІГУРАЦІЯ FIREBASE
+        // (Скопіюйте її з вашого проєкту Firebase, якщо вона відрізняється від цієї)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
+          authDomain: "weegamebot-7c44b.firebaseapp.com",
+          databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
+          projectId: "weegamebot-7c44b",
+          storageBucket: "weegamebot-7c44b.firebasestorage.app",
+          messagingSenderId: "1052981895153",
+          appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
+        };
+
+        // Ініціалізуємо Firebase та Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Отримуємо посилання на Cloud Firestore
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
