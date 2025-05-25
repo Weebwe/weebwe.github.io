@@ -199,11 +199,13 @@ h1 {
     transform: scale(0.95);
     outline: none; /* Прибирає фокусний обвід при активному стані */
     box-shadow: none; /* Прибирає тінь, яка може імітувати обвід */
+background-color: transparent;
 }
 
 .click-area:focus {
     outline: none; /* Прибирає фокусний обвід */
     box-shadow: none; /* Прибирає тінь, яка може імітувати обвід */
+background-color: transparent;
 }
 
 .coin-image {
