@@ -1,22 +1,23 @@
-/* CSS КОД ДЛЯ АДАПТИВНОГО ВІДОБРАЖЕННЯ В TELEGRAM MINI APP */
+/* style.css - Фінальна версія з усіма корективами */
 
-/* Додаємо ці правила, щоб html та body займали весь доступний простір */
+/* Загальні правила для HTML та Body */
 html, body {
     width: 100%;
-    height: 100%; /* Гарантуємо, що html і body займають 100% висоти */
+    height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Запобігаємо прокрутці на рівні html/body */
-    font-family: 'Arial', sans-serif; /* Переносимо сюди, щоб впливав на весь текст */
+    overflow: hidden; /* Запобігаємо прокрутці */
+    font-family: 'Arial', sans-serif;
+    box-sizing: border-box; /* Включаємо padding та border у розмір елемента */
 }
 
+/* Колірна схема: Синій фон, Білий текст (за запитом користувача) */
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #0094FE; /* Ваш корпоративний колір: #0094FE [2025-05-22] */
+    background-color: #0094FE; /* Ваш корпоративний колір: Синій [2025-05-22] */
     color: #FFFFFF; /* Ваш корпоративний колір: Білий [2025-05-22] */
-    box-sizing: border-box;
 }
 
 /* Прихований клас для перемикання екранів */
@@ -24,19 +25,19 @@ body {
     display: none !important;
 }
 
-/* СТИЛІ ДЛЯ ЕКРАНУ ЗАВАНТАЖЕННЯ */
+/* Екран завантаження */
 .loading-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #0094FE; /* Корпоративний колір [2025-05-22] */
+    background-color: #0094FE; /* Корпоративний синій */
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    z-index: 1000; /* Перекриває все інше */
+    z-index: 1000;
     color: #FFFFFF;
     text-align: center;
     padding: 20px;
@@ -53,10 +54,10 @@ body {
 }
 
 .loading-logo {
-    width: clamp(100px, 40vw, 200px); /* Адаптивний розмір логотипу */
+    width: clamp(100px, 40vw, 200px);
     height: auto;
     margin-bottom: 30px;
-    animation: pulse 1.5s infinite alternate; /* Анімація пульсації */
+    animation: pulse 1.5s infinite alternate;
 }
 
 @keyframes pulse {
@@ -67,7 +68,7 @@ body {
 .progress-bar-container {
     width: 100%;
     height: 15px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.3); /* Напівпрозорий білий */
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
@@ -75,10 +76,10 @@ body {
 
 .progress-bar-fill {
     height: 100%;
-    width: 0%; /* Початкова ширина */
-    background-color: #FFFFFF; /* Корпоративний колір - білий [2025-05-22] */
+    width: 0%;
+    background-color: #FFFFFF; /* Корпоративний білий */
     border-radius: 10px;
-    transition: width 0.4s ease-out; /* Плавна анімація заповнення */
+    transition: width 0.4s ease-out;
 }
 
 .loading-text {
@@ -89,34 +90,33 @@ body {
 .copyright {
     font-size: 0.8em;
     opacity: 0.7;
-    position: absolute; /* Розміщуємо внизу екрану */
+    position: absolute;
     bottom: 20px;
     width: 100%;
 }
 
-
-/* ОСНОВНІ СТИЛІ ІГРИ */
+/* Основні стилі ігрового екрану */
 .container {
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.2); /* Темний, напівпрозорий фон для контенту */
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     max-width: 400px;
     width: 100%;
-    height: 100%; /* Тепер контейнер займе 100% висоти body */
+    height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
+    justify-content: space-around;
     align-items: center;
     box-sizing: border-box;
-    margin: auto; /* Для центрування по горизонталі, якщо max-width спрацює */
+    margin: auto;
 }
 
 h1 {
     font-size: clamp(1.5em, 5vw, 2.5em);
     margin-top: 0;
-    margin-bottom: 10px; /* Додано невеликий відступ */
+    margin-bottom: 10px;
     color: #FFFFFF;
     flex-shrink: 0;
 }
@@ -131,33 +131,32 @@ h1 {
     margin-bottom: 15px;
     display: flex;
     align-items: center;
-    gap: 5px; /* Простір між текстом та іконкою */
+    gap: 5px;
 }
 
 .balance-icon {
     width: 50px;
     height: 50px;
-
 }
 
-/* СТИЛІ ДЛЯ ЕНЕРГІЇ */
+/* Стилі для енергії */
 .energy-bar-container {
     width: 90%;
     max-width: 300px;
     height: 20px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2); /* Напівпрозорий білий фон */
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
     position: relative;
     display: flex;
-    align-items: center; /* Центрує текст по вертикалі */
-    justify-content: center; /* Центрує текст по горизонталі */
+    align-items: center;
+    justify-content: center;
 }
 
 .energy-bar-fill {
     height: 100%;
-    width: 100%; /* Початкова ширина */
+    width: 100%;
     background-color: #FFD700; /* Золотий колір для енергії */
     border-radius: 10px;
     position: absolute;
@@ -167,15 +166,15 @@ h1 {
 }
 
 .energy-text {
-    position: relative; /* Щоб був поверх заповнення */
+    position: relative;
     z-index: 1;
     font-weight: bold;
     color: #000; /* Чорний текст для кращого контрасту з золотим фоном */
     font-size: 0.9em;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.5); /* Невеликий тінь для читабельності */
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
 }
 
-
+/* Кнопка кліку (монета) */
 .click-area {
     width: clamp(200px, 70vw, 300px);
     height: clamp(200px, 70vw, 300px);
@@ -187,19 +186,24 @@ h1 {
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
     transition: transform 0.1s ease-out;
-    border: 5px solid rgba(255, 255, 255, 0.5);
+    border: 5px solid rgba(255, 255, 255, 0.5); /* Біла напівпрозора рамка */
     overflow: hidden;
-    flex-shrink: 0;
     background-color: transparent; /* Зробимо прозорим, щоб бачити тільки img */
+    flex-shrink: 0; /* Щоб не стискався на маленьких екранах */
+
+    /* Видаляємо синій фокусний обвід */
+    outline: none;
 }
 
 .click-area:active {
     transform: scale(0.95);
-    outline: none;
+    outline: none; /* Прибирає фокусний обвід при активному стані */
+    box-shadow: none; /* Прибирає тінь, яка може імітувати обвід */
 }
 
 .click-area:focus {
-    outline: none;
+    outline: none; /* Прибирає фокусний обвід */
+    box-shadow: none; /* Прибирає тінь, яка може імітувати обвід */
 }
 
 .coin-image {
@@ -217,6 +221,7 @@ h1 {
     flex-shrink: 0;
 }
 
+/* Секція покращень */
 .boosts {
     margin-top: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
@@ -244,8 +249,8 @@ h1 {
     max-width: 300px;
     padding: 12px;
     margin-bottom: 10px;
-    background-color: #007bb6;
-    color: #FFFFFF;
+    background-color: #FFFFFF; /* Білий колір кнопок апгрейдів */
+    color: #0094FE; /* Синій текст на кнопках апгрейдів */
     border: none;
     border-radius: 8px;
     font-size: clamp(0.9em, 3vw, 1.1em);
@@ -253,6 +258,9 @@ h1 {
     transition: background-color 0.2s ease, transform 0.1s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
+
+    /* Видаляємо синій фокусний обвід для кнопок */
+    outline: none;
 }
 
 .boosts button:last-child {
@@ -260,18 +268,19 @@ h1 {
 }
 
 .boosts button:hover {
-    background-color: #005f8f;
+    background-color: #E0E0E0; /* Трохи темніший білий при наведенні */
     transform: translateY(-2px);
 }
 
 .boosts button:disabled {
     background-color: #555;
+    color: #BBB; /* Сірий текст на відключених кнопках */
     cursor: not-allowed;
     opacity: 0.6;
     box-shadow: none;
 }
 
-/* Медіа-запит для дуже маленьких екранів або великих кнопок */
+/* Медіа-запити для адаптивності */
 @media (max-height: 650px), (max-width: 400px) {
     .container {
         padding: 15px;
@@ -289,45 +298,6 @@ h1 {
         height: clamp(150px, 60vw, 250px);
     }
     .loading-logo {
-        width: clamp(80px, 30vw, 150px); /* Зменшуємо лого на маленьких екранах */
+        width: clamp(80px, 30vw, 150px);
     }
-    /* style.css */
-
-/* Додайте ці правила в кінець вашого style.css */
-
-.click-area:focus {
-    outline: none; /* Прибирає стандартний фокусний обвід */
-    box-shadow: none; /* Прибирає будь-яку тінь, яка може імітувати обвід */
-}
-
-.click-area:active {
-    outline: none; /* Також прибираємо для активного стану */
-    box-shadow: none;
-}
-
-/* Якщо ви хочете прибрати обвід для всіх кнопок, додайте наступне */
-button:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-button:active {
-    outline: none;
-    box-shadow: none;
-}
-
-/* Або більш загально для всіх інтерактивних елементів, але обережно: */
-a:focus,
-input:focus,
-textarea:focus,
-select:focus {
-    outline: none;
-    /* Якщо ви прибираєте outline, бажано додати альтернативний візуальний індикатор фокусу,
-       наприклад, змінити колір фону, тінь або рамку, щоб не погіршити доступність.
-       Наприклад:
-       border: 2px solid #fff;
-       box-shadow: 0 0 5px rgba(255,255,255,0.8);
-    */
-}
-    
 }
