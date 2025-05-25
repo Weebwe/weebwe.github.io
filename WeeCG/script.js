@@ -1,41 +1,35 @@
 // script.js
 
 // --- Firebase Initialization START ---
-// Це ваші конфігураційні дані Firebase.
-// УВАГА: Публікація цих ключів у відкритому репозиторії GitHub НЕБЕЗПЕЧНА для реальних проектів.
-// Використовуйте цей метод тільки для ТЕСТУВАННЯ, якщо ви розумієте ризики,
-// або для приватних репозиторіїв.
-// Для продакшену потрібні більш складні рішення (наприклад, функція Firebase, проксі-сервер).
+// ... (цей блок залишається без змін) ...
+// Зберігайте ваші реальні ключі тут
 const firebaseConfig = {
-    apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
-    authDomain: "weegamebot-7c44b.firebaseapp.com",
-    databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
-    projectId: "weegamebot-7c44b",
-    storageBucket: "weegamebot-7c44b.firebasestorage.app",
-    messagingSenderId: "1052981895153",
-    appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
+  apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
+  authDomain: "weegamebot-7c44b.firebaseapp.com",
+  databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
+  projectId: "weegamebot-7c44b",
+  storageBucket: "weegamebot-7c44b.firebasestorage.app",
+  messagingSenderId: "1052981895153",
+  appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
 };
 
 // Підключення Firebase SDK з CDN
 const firebaseAppScript = document.createElement('script');
-// Використовуємо стару версію Firebase SDK для сумісності з 'firebase.firestore()'
-// яка була вказана у вашому коді. Для нових версій використовується getFirestore().
-firebaseAppScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"; // Останній актуальний CDN шлях для v8
+firebaseAppScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js";
 firebaseAppScript.onload = () => {
     const firebaseFirestoreScript = document.createElement('script');
-    firebaseFirestoreScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"; // Останній актуальний CDN шлях для v8
+    firebaseFirestoreScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js";
     firebaseFirestoreScript.onload = () => {
         const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); // Використовуємо firebase.firestore() для Firebase SDK v8
-        window.db = db; // Зробити доступним глобально
+        const db = firebase.firestore();
+        window.db = db;
 
         console.log("Firebase Firestore initialized.");
 
-        // Тепер, коли Firebase ініціалізовано, завантажуємо дані та запускаємо інтервали
-        loadPlayerData(); // Цей виклик тепер безпечний
+        // loadPlayerData() тепер викликається зDOMContentLoaded після отримання Telegram ID
+        // startAutoClicker() та startEnergyRecharge() будуть викликані з loadPlayerData()
     };
     document.head.appendChild(firebaseFirestoreScript);
-
 };
 document.head.appendChild(firebaseAppScript);
 
@@ -51,7 +45,7 @@ const upgrade2CostElement = document.getElementById('upgrade2Cost');
 const debugUserIdElement = document.getElementById('debugUserId');
 
 const loadingScreen = document.getElementById('loading-screen');
-const gameScreen = document.getElementById('game-screen');
+const gameScreen = document.getElementById('game-screen'); // Отримання посилання на ігровий екран
 const progressBarFill = document.getElementById('progressBarFill');
 const loadingText = document.getElementById('loadingText');
 
@@ -70,12 +64,11 @@ let telegramUserId = null;
 
 let currentEnergy = 1000;
 const maxEnergy = 1000;
-const energyRechargeRate = 100; // Кількість енергії, що відновлюється за один інтервал
-const energyRechargeIntervalTime = 86400000; // 24 години в мілісекундах (24 * 60 * 60 * 1000)
-let lastEnergyRechargeTime = Date.now(); // Час останнього відновлення або збереження енергії
+
+// НОВА ЗМІННА: Час останнього повного відновлення енергії
+let lastEnergyRechargeTime = 0; // Зберігаємо як мілісекунди з початку епохи (timestamp)
 
 let autoClickInterval;
-let energyRechargeInterval;
 
 const coinClickSound = new Audio('coin_click.mp3');
 coinClickSound.volume = 0.5;
@@ -101,22 +94,32 @@ function updateEnergyDisplay() {
     clickButton.style.cursor = currentEnergy <= 0 ? 'not-allowed' : 'pointer';
 }
 
-// Перевірка апгрейдів
+// Перевірка апгрейдів (без змін)
 function checkUpgradeAvailability() {
     upgrade1Button.disabled = score < upgrade1Cost;
     upgrade2Button.disabled = score < upgrade2Cost;
 }
 
-// Функція відновлення енергії, що викликається інтервалом
-function rechargeEnergy() {
-    if (currentEnergy < maxEnergy) {
-        currentEnergy += energyRechargeRate;
-        currentEnergy = Math.min(currentEnergy, maxEnergy);
-        lastEnergyRechargeTime = Date.now(); // Оновлюємо час відновлення
+// Функція відновлення енергії раз на добу
+function rechargeEnergyOncePerDay() {
+    const twentyFourHoursInMs = 24 * 60 * 60 * 1000; // 24 години в мілісекундах
+    const currentTime = Date.now();
+
+    // Якщо енергія не повна і минуло 24 години з останнього поповнення
+    if (currentEnergy < maxEnergy && (currentTime - lastEnergyRechargeTime) >= twentyFourHoursInMs) {
+        currentEnergy = maxEnergy; // Поповнюємо до максимуму
+        lastEnergyRechargeTime = currentTime; // Оновлюємо час останнього повного поповнення
         updateEnergyDisplay();
-        savePlayerData();
+        savePlayerData(); // Зберігаємо дані після поповнення
+        console.log("Енергія повністю відновлена!");
+    } else if (currentEnergy >= maxEnergy) {
+        // Якщо енергія повна, просто оновлюємо час останнього повного поповнення,
+        // щоб наступне поповнення було через 24 години від цього моменту.
+        lastEnergyRechargeTime = currentTime;
+        savePlayerData(); // Зберігаємо, щоб оновити lastEnergyRechargeTime
     }
 }
+
 
 // Завантаження з Firestore
 async function loadPlayerData() {
@@ -128,9 +131,11 @@ async function loadPlayerData() {
 
     if (!telegramUserId) {
         console.warn("Telegram User ID not available for load. Running in test mode.");
-        telegramUserId = 'test_user_local'; // Встановлюємо тестовий ID, щоб гра не зупинялась
+        telegramUserId = 'test_user_local';
         updateDisplay();
-        return;
+        // Запускаємо автоклікер, навіть для тестового режиму, без Firestore
+        startAutoClicker();
+        return; // Виходимо, якщо немає реального ID
     }
 
     try {
@@ -144,30 +149,20 @@ async function loadPlayerData() {
             upgrade1Cost = data.upgrade1Cost || 100;
             upgrade2Cost = data.upgrade2Cost || 500;
             currentEnergy = data.currentEnergy || maxEnergy;
-            lastEnergyRechargeTime = data.lastEnergyRechargeTime || Date.now(); // Завантажуємо час
-            
-            // Розрахунок відновлення енергії після відсутності
-            const timeElapsed = Date.now() - lastEnergyRechargeTime;
-            if (timeElapsed > 0) {
-                const rechargeCycles = Math.floor(timeElapsed / energyRechargeIntervalTime);
-                if (rechargeCycles > 0) {
-                    currentEnergy += rechargeCycles * energyRechargeRate;
-                    currentEnergy = Math.min(currentEnergy, maxEnergy);
-                    lastEnergyRechargeTime = Date.now(); // Оновлюємо час після розрахунку
-                    console.log(`Відновлено ${rechargeCycles * energyRechargeRate} енергії за час відсутності.`);
-                }
-            }
-
+            // Зчитуємо час останнього поповнення з Firestore
+            lastEnergyRechargeTime = data.lastEnergyRechargeTime || 0;
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
-            // Якщо новий гравець, встановлюємо початковий час
+            // Якщо нові гравці, встановлюємо початковий час поповнення на поточний момент
             lastEnergyRechargeTime = Date.now();
         }
         updateDisplay();
 
         // Запуск інтервалів ПІСЛЯ завантаження даних
         startAutoClicker();
-        startEnergyRecharge();
+
+        // ОДНОРАЗОВА ПЕРЕВІРКА ЕНЕРГІЇ ПРИ ЗАВАНТАЖЕННІ
+        rechargeEnergyOncePerDay();
 
     } catch (e) {
         console.error('Помилка завантаження даних гравця:', e);
@@ -181,7 +176,7 @@ async function savePlayerData() {
         console.warn("Firestore не ініціалізований. Збереження неможливе.");
         return;
     }
-    if (telegramUserId === 'test_user_local' || !telegramUserId) { // Перевірка на null також
+    if (telegramUserId === 'test_user_local' || !telegramUserId) {
         console.warn("Cannot save data: Telegram User ID is test ID or not available. Data will not be saved to Firestore.");
         return;
     }
@@ -189,15 +184,16 @@ async function savePlayerData() {
     try {
         await window.db.collection("players").doc(telegramUserId).set({
             score, mainBalance, clickPower, autoClickPower,
-            upgrade1Cost, upgrade2Cost, currentEnergy, lastEnergyRechargeTime // Зберігаємо час
-        });
-        // console.log("Player data saved for", telegramUserId); // Закоментовано для чистоти логів
+            upgrade1Cost, upgrade2Cost, currentEnergy,
+            lastEnergyRechargeTime // Зберігаємо час останнього поповнення
+        }, { merge: true }); // Використовуємо merge, щоб не перезаписувати інші поля
+        // console.log("Player data saved for", telegramUserId);
     } catch (e) {
         console.error("Помилка збереження даних гравця:", e);
     }
 }
 
-// Автоклік
+// Автоклік (без змін)
 function startAutoClicker() {
     if (autoClickInterval) clearInterval(autoClickInterval);
     if (autoClickPower > 0) {
@@ -209,13 +205,7 @@ function startAutoClicker() {
     }
 }
 
-// Відновлення енергії
-function startEnergyRecharge() {
-    if (energyRechargeInterval) clearInterval(energyRechargeInterval);
-    energyRechargeInterval = setInterval(rechargeEnergy, energyRechargeIntervalTime);
-}
-
-// Прогрес завантаження
+// Прогрес завантаження (без змін)
 function startLoadingProgress() {
     let progress = 0;
     const interval = setInterval(() => {
@@ -228,7 +218,7 @@ function startLoadingProgress() {
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
                 gameScreen.classList.remove('hidden');
-                // loadPlayerData() та інші інтервали тепер викликаються з Firebase onload
+                // loadPlayerData() тепер викликається з DOMContentLoaded після отримання Telegram ID
             }, 4000);
         }
     }, 50);
@@ -240,44 +230,71 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
         tg.ready();
-        setTimeout(() => tg.expand(), 100); // Розширюємо Web App на весь екран
+        setTimeout(() => tg.expand(), 100);
 
         if (tg.initDataUnsafe?.user?.id) {
             telegramUserId = tg.initDataUnsafe.user.id.toString();
             debugUserIdElement.textContent = "ID: " + telegramUserId;
             console.log("Telegram User ID obtained:", telegramUserId);
+            loadPlayerData(); // Викликаємо loadPlayerData тут, після отримання Telegram ID
         } else {
             console.warn("Telegram User ID not available from tg.initDataUnsafe.user.id.");
             debugUserIdElement.textContent = "ID: Недоступний (тест)";
+            loadPlayerData(); // Викликаємо loadPlayerData навіть для тестового режиму
         }
     } else {
         console.warn("Telegram Web App API not found. Please open in Telegram to get user ID.");
         debugUserIdElement.textContent = "ID: API Telegram не знайдено";
-        // Для тестування без Telegram, показуємо гру
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
-            // loadPlayerData() та інші інтервали тепер викликаються зсередини Firebase onload, а не тут
+            loadPlayerData(); // Викликаємо loadPlayerData для тестового режиму
         }, 2000);
     }
 
-    startLoadingProgress(); // Запускаємо процес завантаження при старті
+    startLoadingProgress();
 
     // Обробник кліку
-    clickButton.addEventListener('click', () => {
+    clickButton.addEventListener('click', (event) => { // Додано 'event'
         if (currentEnergy > 0) {
             score += clickPower;
             currentEnergy--;
             updateDisplay();
-            savePlayerData();
+            savePlayerData(); // Зберігаємо дані після кожного кліку
+
             try {
                 coinClickSound.currentTime = 0;
                 coinClickSound.play();
             } catch (e) {
                 console.error("Помилка відтворення звуку:", e);
             }
+
+            // --- НОВИЙ КОД ДЛЯ ПЛАВАЮЧОГО ТЕКСТУ ---
+            const floatingText = document.createElement('div');
+            floatingText.classList.add('floating-text');
+            floatingText.textContent = `+${clickPower}`;
+
+            // Отримуємо позицію кліку відносно вікна
+            const clickX = event.clientX;
+            const clickY = event.clientY;
+
+            // Встановлюємо позицію тексту
+            // Трохи зміщуємо від місця кліку, щоб не закривати палець
+            floatingText.style.left = `${clickX}px`;
+            floatingText.style.top = `${clickY - 20}px`; // Зміщуємо вище від місця кліку
+
+            gameScreen.appendChild(floatingText); // Додаємо до game-screen або container
+
+            // Видаляємо елемент після анімації
+            floatingText.addEventListener('animationend', () => {
+                floatingText.remove();
+            });
+            // --- КІНЕЦЬ НОВОГО КОДУ ---
+
         } else {
             console.log("Енергія вичерпана!");
+            // Тут можна додати візуальний фідбек для вичерпаної енергії,
+            // наприклад, показати спливаюче повідомлення "Енергія вичерпана!"
         }
     });
 
@@ -288,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             upgrade1Cost = Math.floor(upgrade1Cost * 1.5);
             updateDisplay();
             savePlayerData();
+            // Тут можна додати звук для апгрейду
         }
     });
 
@@ -296,12 +314,12 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade2Cost;
             autoClickPower += 1;
             upgrade2Cost = Math.floor(upgrade2Cost * 2);
-            startAutoClicker(); // Перезапускаємо автоклікер з новою потужністю
+            startAutoClicker();
             updateDisplay();
             savePlayerData();
+            // Тут можна додати звук для апгрейду
         }
     });
 
     setInterval(savePlayerData, 5000); // Автоматичне збереження кожні 5 секунд
-
 });
