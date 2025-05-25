@@ -33,7 +33,7 @@ const energyRechargeIntervalTime = 5000; // Інтервал відновлен�
 let autoClickInterval;
 let energyRechargeInterval;
 
-const coinClickSound = new Audio('coin_click.mp3'); // Переконайтеся, що файл існує
+const coinClickSound = new Audio('coin_click.mp3'); // Переконайтеся, що файл 'coin_click.mp3' існує
 coinClickSound.volume = 0.5;
 
 // Функція оновлення відображення очок та балансів
@@ -92,6 +92,8 @@ async function loadPlayerData() {
 
     if (!telegramUserId) {
         console.warn("Telegram User ID not available. Running in test mode without saving progress.");
+        // Якщо ID не отримано, встановлюємо тимчасовий тестовий ID, щоб гра могла працювати
+        // Але дані для нього не будуть зберігатися на сервері
         telegramUserId = 'test_user_local';
         updateDisplay();
         return;
@@ -153,7 +155,7 @@ async function savePlayerData() {
     }
 
     if (!telegramUserId || telegramUserId === 'test_user_local') {
-        console.warn("Cannot save data: Telegram User ID is not available or is a test ID.");
+        console.warn("Cannot save data: Telegram User ID is not available or is a test ID. Data will not be saved to Firestore.");
         return;
     }
 
