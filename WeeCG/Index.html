@@ -1,21 +1,49 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WEE Coin Clicker</title>
-  <link rel="stylesheet" href="style.css">
-
-  <!-- 1. Додайте SDK Telegram Web App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- 2. Ваш Firebase init -->
-  <script type="module" src="firebase-init.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEE Coin Clicker</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-init.js"></script>
 </head>
 <body>
-  <!-- ... ваш HTML ... -->
 
-  <!-- 3. Ваш основний скрипт має підвантажуватися ПІСЛЯ SDK -->
-  <script src="script.js"></script>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <img src="logo.jpg" alt="Company Logo" class="loading-logo">
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+            <p class="loading-text" id="loadingText">Завантаження...</p>
+            <p class="copyright">© 2025 WEE Coin. Всі права захищені.</p>
+        </div>
+    </div>
+
+    <div id="game-screen" class="container hidden">
+        <p id="debugUserId" class="debug-info"></p>
+
+        <h1>Твої монети: <span id="score">0</span> 🪙</h1>
+        <p class="secondary-balance">Твій основний баланс: <span id="mainBalance">0</span> <img src="coin.png" alt="WEE Coin Icon" class="balance-icon"></p>
+
+        <div class="energy-bar-container">
+            <div class="energy-bar-fill" id="energyBarFill"></div>
+            <span class="energy-text" id="energyText"></span>
+        </div>
+
+        <div id="clickButton" class="click-area">
+            <img src="coin.png" alt="Click Coin" class="coin-image">
+        </div>
+
+        <p class="instructions">Натискай на монету, щоб заробляти!</p>
+
+        <div class="boosts">
+            <h2>Покращення</h2>
+            <button id="upgrade1">Більше монет за клік (+1) - Коштує: <span id="upgrade1Cost">100</span> 🪙</button>
+            <button id="upgrade2">Авто-клікер (+1 монета/сек) - Коштує: <span id="upgrade2Cost">500</span> 🪙</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
