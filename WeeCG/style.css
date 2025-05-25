@@ -7,41 +7,116 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden; /* Запобігаємо прокрутці на рівні html/body */
+    font-family: 'Arial', sans-serif; /* Переносимо сюди, щоб впливав на весь текст */
 }
 
 body {
-    font-family: 'Arial', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Забезпечує, що body займає всю висоту вікна */
     background-color: #0094FE; /* Ваш корпоративний колір: #0094FE */
     color: #FFFFFF; /* Ваш корпоративний колір: Білий */
-    padding: 0; /* Прибираємо зовнішній padding на body */
     box-sizing: border-box;
 }
 
+/* Прихований клас для перемикання екранів */
+.hidden {
+    display: none !important;
+}
+
+/* СТИЛІ ДЛЯ ЕКРАНУ ЗАВАНТАЖЕННЯ */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0094FE; /* Корпоративний колір */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000; /* Перекриває все інше */
+    color: #FFFFFF;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    max-width: 300px;
+}
+
+.loading-logo {
+    width: clamp(100px, 40vw, 200px); /* Адаптивний розмір логотипу */
+    height: auto;
+    margin-bottom: 30px;
+    animation: pulse 1.5s infinite alternate; /* Анімація пульсації */
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%; /* Початкова ширина */
+    background-color: #FFFFFF; /* Корпоративний колір - білий */
+    border-radius: 10px;
+    transition: width 0.4s ease-out; /* Плавна анімація заповнення */
+}
+
+.loading-text {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.copyright {
+    font-size: 0.8em;
+    opacity: 0.7;
+    position: absolute; /* Розміщуємо внизу екрану */
+    bottom: 20px;
+    width: 100%;
+}
+
+
+/* ОСНОВНІ СТИЛІ ІГРИ */
 .container {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.2);
-    padding: 20px; /* Внутрішні відступи контейнера */
+    padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    max-width: 400px; /* Обмежуємо максимальну ширину для великих екранів */
-    width: 100%; /* Займає 100% ширини батьківського елемента */
-    height: 100%; /* Займає 100% висоти батьківського елемента */
+    max-width: 400px;
+    width: 100%;
+    height: 100%; /* Тепер контейнер займе 100% висоти body */
     display: flex;
     flex-direction: column;
     justify-content: space-around; /* Розподіляє простір рівномірно між елементами */
     align-items: center;
     box-sizing: border-box;
-    margin: auto;
+    margin: auto; /* Для центрування по горизонталі, якщо max-width спрацює */
 }
 
 h1 {
     font-size: clamp(1.5em, 5vw, 2.5em);
     margin-top: 0;
-    margin-bottom: 0;
+    margin-bottom: 10px; /* Додано невеликий відступ */
     color: #FFFFFF;
     flex-shrink: 0;
 }
@@ -50,10 +125,59 @@ h1 {
     font-weight: bold;
 }
 
+.secondary-balance {
+    font-size: clamp(1em, 3vw, 1.4em);
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Простір між текстом та іконкою */
+}
+
+.balance-icon {
+    width: clamp(20px, 5vw, 30px);
+    height: auto;
+}
+
+/* СТИЛІ ДЛЯ ЕНЕРГІЇ */
+.energy-bar-container {
+    width: 90%;
+    max-width: 300px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+    display: flex;
+    align-items: center; /* Центрує текст по вертикалі */
+    justify-content: center; /* Центрує текст по горизонталі */
+}
+
+.energy-bar-fill {
+    height: 100%;
+    width: 100%; /* Початкова ширина */
+    background-color: #FFD700; /* Золотий колір для енергії */
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: width 0.2s ease-out;
+}
+
+.energy-text {
+    position: relative; /* Щоб був поверх заповнення */
+    z-index: 1;
+    font-weight: bold;
+    color: #000; /* Чорний текст для кращого контрасту з золотим фоном */
+    font-size: 0.9em;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5); /* Невеликий тінь для читабельності */
+}
+
+
 .click-area {
-    /* ЗМІНЕНО: Збільшуємо розмір монети, щоб вона займала більше місця */
-    width: clamp(200px, 70vw, 300px); /* Було 150px, 50vw, 200px */
-    height: clamp(200px, 70vw, 300px); /* Було 150px, 50vw, 200px */
+    width: clamp(200px, 70vw, 300px);
+    height: clamp(200px, 70vw, 300px);
     border-radius: 50%;
     margin: 0;
     display: flex;
@@ -65,6 +189,7 @@ h1 {
     border: 5px solid rgba(255, 255, 255, 0.5);
     overflow: hidden;
     flex-shrink: 0;
+    background-color: #FFFFFF; /* Фон для монети */
 }
 
 .click-area:active {
@@ -159,8 +284,10 @@ h1 {
         font-size: clamp(0.8em, 2.5vw, 1em);
     }
     .click-area {
-        /* ЗМІНЕНО: Регулюємо розмір монети для маленьких екранів */
-        width: clamp(150px, 60vw, 250px); /* Було 120px, 45vw, 180px */
-        height: clamp(150px, 60vw, 250px); /* Було 120px, 45vw, 180px */
+        width: clamp(150px, 60vw, 250px);
+        height: clamp(150px, 60vw, 250px);
+    }
+    .loading-logo {
+        width: clamp(80px, 30vw, 150px); /* Зменшуємо лого на маленьких екранах */
     }
 }
