@@ -1,305 +1,282 @@
-/* style.css - Фінальна версія з усіма корективами */
+/* === Фінальний style.css для гри (Weebwe стиль) === */
 
-/* Загальні правила для HTML та Body */
+/* Загальні стилі */
+* {
+  box-sizing: border-box;
+}
+
 html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Запобігаємо прокрутці */
-    font-family: 'Arial', sans-serif;
-    box-sizing: border-box; /* Включаємо padding та border у розмір елемента */
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden;
+  background-color: #0094FE;
+  color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent; /* iOS tap ефект */
 }
 
-/* Колірна схема: Синій фон, Білий текст (за запитом користувача) */
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #0094FE; /* Ваш корпоративний колір: Синій [2025-05-22] */
-    color: #FFFFFF; /* Ваш корпоративний колір: Білий [2025-05-22] */
-}
-
-/* Прихований клас для перемикання екранів */
 .hidden {
-    display: none !important;
+  display: none !important;
 }
 
 /* Екран завантаження */
 .loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #0094FE; /* Корпоративний синій */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 1000;
-    color: #FFFFFF;
-    text-align: center;
-    padding: 20px;
-    box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  background-color: #0094FE;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
 }
 
 .loading-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 80%;
-    max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  max-width: 300px;
 }
 
 .loading-logo {
-    width: clamp(100px, 40vw, 200px);
-    height: auto;
-    margin-bottom: 30px;
-    animation: pulse 1.5s infinite alternate;
+  width: clamp(100px, 40vw, 200px);
+  height: auto;
+  margin-bottom: 30px;
+  animation: pulse 1.5s infinite alternate;
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1.05); opacity: 0.9; }
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.05); opacity: 0.9; }
 }
 
 .progress-bar-container {
-    width: 100%;
-    height: 15px;
-    background-color: rgba(255, 255, 255, 0.3); /* Напівпрозорий білий */
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 20px;
+  width: 100%;
+  height: 15px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .progress-bar-fill {
-    height: 100%;
-    width: 0%;
-    background-color: #FFFFFF; /* Корпоративний білий */
-    border-radius: 10px;
-    transition: width 0.4s ease-out;
+  width: 0%;
+  height: 100%;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  transition: width 0.4s ease-out;
 }
 
 .loading-text {
-    font-size: 1.2em;
-    margin-bottom: 10px;
+  font-size: 1.2em;
+  margin-bottom: 10px;
 }
 
 .copyright {
-    font-size: 0.8em;
-    opacity: 0.7;
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
+  font-size: 0.8em;
+  opacity: 0.7;
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
 }
 
-/* Основні стилі ігрового екрану */
+/* Основний екран */
 .container {
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.2); /* Темний, напівпрозорий фон для контенту */
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    box-sizing: border-box;
-    margin: auto;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
 
 h1 {
-    font-size: clamp(1.5em, 5vw, 2.5em);
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: #FFFFFF;
-    flex-shrink: 0;
+  font-size: clamp(1.5em, 5vw, 2.5em);
+  margin: 0 0 10px;
+  color: #FFFFFF;
+  flex-shrink: 0;
 }
 
 #score {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .secondary-balance {
-    font-size: clamp(1em, 3vw, 1.4em);
-    margin-top: 0;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  font-size: clamp(1em, 3vw, 1.4em);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .balance-icon {
-    width: 50px;
-    height: 50px;
+  width: 50px;
+  height: 50px;
 }
 
-/* Стилі для енергії */
+/* Енергія */
 .energy-bar-container {
-    width: 90%;
-    max-width: 300px;
-    height: 20px;
-    background-color: rgba(255, 255, 255, 0.2); /* Напівпрозорий білий фон */
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 90%;
+  max-width: 300px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .energy-bar-fill {
-    height: 100%;
-    width: 100%;
-    background-color: #FFD700; /* Золотий колір для енергії */
-    border-radius: 10px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: width 0.2s ease-out;
+  width: 100%;
+  height: 100%;
+  background-color: #FFD700;
+  border-radius: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 0.2s ease-out;
 }
 
 .energy-text {
-    position: relative;
-    z-index: 1;
-    font-weight: bold;
-    color: #000; /* Чорний текст для кращого контрасту з золотим фоном */
-    font-size: 0.9em;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+  position: relative;
+  z-index: 1;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #000;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
 }
 
-/* Кнопка кліку (монета) */
+/* Кнопка-клік (монета) */
 .click-area {
-    width: clamp(200px, 70vw, 300px);
-    height: clamp(200px, 70vw, 300px);
-    border-radius: 50%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    transition: transform 0.1s ease-out;
-    border: 5px solid rgba(255, 255, 255, 0.5); /* Біла напівпрозора рамка */
-    overflow: hidden;
-    background-color: transparent; /* Зробимо прозорим, щоб бачити тільки img */
-    flex-shrink: 0; /* Щоб не стискався на маленьких екранах */
-
-    /* Видаляємо синій фокусний обвід */
-    outline: none;
+  width: clamp(200px, 70vw, 300px);
+  height: clamp(200px, 70vw, 300px);
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.5);
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  flex-shrink: 0;
+  outline: none;
 }
 
+.click-area:focus,
 .click-area:active {
-    transform: scale(0.95);
-    outline: none; /* Прибирає фокусний обвід при активному стані */
-    box-shadow: none; /* Прибирає тінь, яка може імітувати обвід */
-background-color: transparent;
-}
-
-.click-area:focus {
-    outline: none; /* Прибирає фокусний обвід */
-    box-shadow: none; /* Прибирає тінь, яка може імітувати обвід */
-background-color: transparent;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
 }
 
 .coin-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .instructions {
-    font-size: clamp(0.9em, 2.5vw, 1.1em);
-    margin-top: 0;
-    margin-bottom: 0;
-    opacity: 0.8;
-    flex-shrink: 0;
+  font-size: clamp(0.9em, 2.5vw, 1.1em);
+  margin: 0;
+  opacity: 0.8;
+  flex-shrink: 0;
 }
 
-/* Секція покращень */
+/* Покращення */
 .boosts {
-    margin-top: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    padding-top: 20px;
-    width: 100%;
-    flex-grow: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 0;
+  margin-top: 0;
+  padding-top: 20px;
+  padding-bottom: 0;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .boosts h2 {
-    font-size: clamp(1.4em, 4vw, 1.8em);
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #FFFFFF;
-    flex-shrink: 0;
+  font-size: clamp(1.4em, 4vw, 1.8em);
+  margin: 0 0 15px;
+  color: #FFFFFF;
 }
 
 .boosts button {
-    display: block;
-    width: 90%;
-    max-width: 300px;
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: #FFFFFF; /* Білий колір кнопок апгрейдів */
-    color: #0094FE; /* Синій текст на кнопках апгрейдів */
-    border: none;
-    border-radius: 8px;
-    font-size: clamp(0.9em, 3vw, 1.1em);
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    flex-shrink: 0;
-
-    /* Видаляємо синій фокусний обвід для кнопок */
-    outline: none;
+  width: 90%;
+  max-width: 300px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background-color: #FFFFFF;
+  color: #0094FE;
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(0.9em, 3vw, 1.1em);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  outline: none;
 }
 
-.boosts button:last-child {
-    margin-bottom: 0;
+.boosts button:focus,
+.boosts button:active {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .boosts button:hover {
-    background-color: #E0E0E0; /* Трохи темніший білий при наведенні */
-    transform: translateY(-2px);
+  background-color: #E0E0E0;
+  transform: translateY(-2px);
 }
 
 .boosts button:disabled {
-    background-color: #555;
-    color: #BBB; /* Сірий текст на відключених кнопках */
-    cursor: not-allowed;
-    opacity: 0.6;
-    box-shadow: none;
+  background-color: #555;
+  color: #BBB;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
-/* Медіа-запити для адаптивності */
+/* Адаптивність */
 @media (max-height: 650px), (max-width: 400px) {
-    .container {
-        padding: 15px;
-    }
-    .boosts h2 {
-        margin-bottom: 10px;
-    }
-    .boosts button {
-        padding: 10px;
-        margin-bottom: 8px;
-        font-size: clamp(0.8em, 2.5vw, 1em);
-    }
-    .click-area {
-        width: clamp(150px, 60vw, 250px);
-        height: clamp(150px, 60vw, 250px);
-    }
-    .loading-logo {
-        width: clamp(80px, 30vw, 150px);
-    }
+  .container {
+    padding: 15px;
+  }
+
+  .boosts h2 {
+    margin-bottom: 10px;
+  }
+
+  .boosts button {
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: clamp(0.8em, 2.5vw, 1em);
+  }
+
+  .click-area {
+    width: clamp(150px, 60vw, 250px);
+    height: clamp(150px, 60vw, 250px);
+  }
+
+  .loading-logo {
+    width: clamp(80px, 30vw, 150px);
+  }
 }
