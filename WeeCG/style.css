@@ -14,8 +14,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #0094FE; /* Ваш корпоративний колір: #0094FE */
-    color: #FFFFFF; /* Ваш корпоративний колір: Білий */
+    background-color: #0094FE; /* Ваш корпоративний колір: #0094FE [2025-05-22] */
+    color: #FFFFFF; /* Ваш корпоративний колір: Білий [2025-05-22] */
     box-sizing: border-box;
 }
 
@@ -31,7 +31,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #0094FE; /* Корпоративний колір */
+    background-color: #0094FE; /* Корпоративний колір [2025-05-22] */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,7 +76,7 @@ body {
 .progress-bar-fill {
     height: 100%;
     width: 0%; /* Початкова ширина */
-    background-color: #FFFFFF; /* Корпоративний колір - білий */
+    background-color: #FFFFFF; /* Корпоративний колір - білий [2025-05-22] */
     border-radius: 10px;
     transition: width 0.4s ease-out; /* Плавна анімація заповнення */
 }
@@ -189,7 +189,7 @@ h1 {
     border: 5px solid rgba(255, 255, 255, 0.5);
     overflow: hidden;
     flex-shrink: 0;
-    background-color: #FFFFFF; /* Фон для монети */
+    background-color: transparent; /* Зробимо прозорим, щоб бачити тільки img */
 }
 
 .click-area:active {
