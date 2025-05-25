@@ -288,3 +288,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Автоматичне збереження кожні 5 секунд
     setInterval(savePlayerData, 5000);
 });
+                                 
