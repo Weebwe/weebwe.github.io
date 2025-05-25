@@ -84,8 +84,9 @@ function checkUpgradeAvailability() {
 
 // Функція для завантаження даних гравця з Firestore
 async function loadPlayerData() {
+    // Перевірка наявності window.db перед використанням
     if (typeof window.db === 'undefined' || !window.db) {
-        console.error("Firebase Firestore is not initialized or not accessible (db is undefined).");
+        console.error("Firebase Firestore is not initialized or not accessible (window.db is undefined). Please check firebase-init.js.");
         updateDisplay();
         return;
     }
@@ -141,6 +142,7 @@ async function loadPlayerData() {
 
     } catch (error) {
         console.error('Error loading player data:', error);
+        // У випадку помилки завантаження, все одно оновлюємо UI з початковими/поточними значеннями
         upgrade1CostElement.textContent = upgrade1Cost;
         upgrade2CostElement.textContent = upgrade2Cost;
         updateDisplay();
@@ -149,8 +151,9 @@ async function loadPlayerData() {
 
 // Функція для збереження даних гравця в Firestore
 async function savePlayerData() {
+    // Перевірка наявності window.db перед використанням
     if (typeof window.db === 'undefined' || !window.db) {
-        console.error("Firebase Firestore is not initialized or not accessible for saving.");
+        console.error("Firebase Firestore is not initialized or not accessible for saving (window.db is undefined).");
         return;
     }
 
@@ -214,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (debugUserIdElement) {
                 debugUserIdElement.textContent = "ID: " + telegramUserId;
             }
+            console.log("Telegram User ID obtained:", telegramUserId); // Додано лог для підтвердження
         } else {
             console.warn("Telegram User ID not available (tg.initDataUnsafe.user.id is missing).");
             if (debugUserIdElement) {
