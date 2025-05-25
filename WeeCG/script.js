@@ -62,8 +62,8 @@ let upgrade1Cost = 100;
 let upgrade2Cost = 500;
 let telegramUserId = null;
 
-let currentEnergy = 1000;
-const maxEnergy = 1000;
+let currentEnergy = 100;
+const maxEnergy = 100;
 
 // НОВА ЗМІННА: Час останнього повного відновлення енергії
 let lastEnergyRechargeTime = 0; // Зберігаємо як мілісекунди з початку епохи (timestamp)
