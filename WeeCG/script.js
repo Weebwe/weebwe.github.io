@@ -1,13 +1,18 @@
+// script.js - Оновлена версія для коректної роботи Firebase
+
 // --- Firebase Initialization START ---
 const firebaseConfig = {
   apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
   authDomain: "weegamebot-7c44b.firebaseapp.com",
   databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
   projectId: "weegamebot-7c44b",
-  storageBucket: "weegamebot-7c44b.appspot.com",
+  storageBucket: "weegamebot-7c44b.appspot.com", // Це має бути appspot.com
   messagingSenderId: "1052981895153",
   appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
 };
+
+// Зробимо db глобальною змінною з самого початку
+let db;
 
 const firebaseAppScript = document.createElement('script');
 firebaseAppScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js";
@@ -16,10 +21,12 @@ firebaseAppScript.onload = () => {
     firebaseFirestoreScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js";
     firebaseFirestoreScript.onload = () => {
         const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        window.db = db;
+        db = firebase.firestore(); // Присвоюємо db до глобальної змінної
+        // console.log("Firebase Firestore initialized:", db); // Для налагодження
 
-        console.log("Firebase Firestore initialized.");
+        // Тепер, коли Firebase повністю ініціалізовано, ми готові завантажувати дані
+        // Виклик loadPlayerData() перенесено сюди, щоб гарантувати, що db доступний
+        initializeGameAfterFirebase();
     };
     document.head.appendChild(firebaseFirestoreScript);
 };
@@ -53,8 +60,8 @@ let upgrade1Cost = 100;
 let upgrade2Cost = 500;
 let telegramUserId = null;
 
-let currentEnergy = 1000;
-const maxEnergy = 1000;
+let currentEnergy = 100; // Змінено на 100
+const maxEnergy = 100;    // Змінено на 100
 let lastEnergyRechargeTime = 0;
 let autoClickInterval;
 
@@ -104,16 +111,20 @@ function rechargeEnergyOncePerDay() {
 
 // --- Firebase: Load & Save ---
 async function loadPlayerData() {
-    if (!window.db) return console.error("Firestore not initialized.");
+    if (!db) { // Перевіряємо глобальну змінну db
+        console.error("Firestore not initialized yet. Cannot load player data.");
+        return;
+    }
     if (!telegramUserId) {
         telegramUserId = 'test_user_local';
+        console.warn("Telegram User ID not available for load. Running in test mode.");
         updateDisplay();
         startAutoClicker();
         return;
     }
 
     try {
-        const doc = await db.collection("players").doc(telegramUserId).get();
+        const doc = await db.collection("players").doc(telegramUserId).get(); // Використовуємо глобальну db
         if (doc.exists) {
             const data = doc.data();
             score = data.score || 0;
@@ -125,7 +136,8 @@ async function loadPlayerData() {
             currentEnergy = data.currentEnergy || maxEnergy;
             lastEnergyRechargeTime = data.lastEnergyRechargeTime || Date.now();
         } else {
-            lastEnergyRechargeTime = Date.now();
+            console.log("No player data found for", telegramUserId, ". Starting new game.");
+            lastEnergyRechargeTime = Date.now(); // Для нового гравця встановлюємо поточний час
         }
         updateDisplay();
         startAutoClicker();
@@ -137,13 +149,17 @@ async function loadPlayerData() {
 }
 
 async function savePlayerData() {
-    if (!window.db || !telegramUserId || telegramUserId === 'test_user_local') return;
+    if (!db || !telegramUserId || telegramUserId === 'test_user_local') { // Перевіряємо глобальну змінну db
+        // console.warn("Cannot save data: Firestore not initialized or Telegram User ID is test ID/not available.");
+        return;
+    }
     try {
-        await db.collection("players").doc(telegramUserId).set({
+        await db.collection("players").doc(telegramUserId).set({ // Використовуємо глобальну db
             score, mainBalance, clickPower, autoClickPower,
             upgrade1Cost, upgrade2Cost, currentEnergy,
             lastEnergyRechargeTime
         }, { merge: true });
+        // console.log("Player data saved for", telegramUserId);
     } catch (e) {
         console.error("Error saving player data:", e);
     }
@@ -156,7 +172,10 @@ function startAutoClicker() {
         autoClickInterval = setInterval(() => {
             score += autoClickPower;
             updateDisplay();
-            savePlayerData();
+            // Зберігаємо дані тут, тільки якщо це не тестовий користувач
+            if (telegramUserId !== 'test_user_local') {
+                savePlayerData();
+            }
         }, 1000);
     }
 }
@@ -174,13 +193,15 @@ function startLoadingProgress() {
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
                 gameScreen.classList.remove('hidden');
+                // initializeGameAfterFirebase() тепер викликає loadPlayerData()
             }, 4000);
         }
     }, 50);
 }
 
-// --- Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
+// --- Main Game Initialization ---
+// Ця функція викликається, коли Firebase повністю ініціалізовано
+function initializeGameAfterFirebase() {
     if (window.Telegram?.WebApp) {
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -189,20 +210,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tg.initDataUnsafe?.user?.id) {
             telegramUserId = tg.initDataUnsafe.user.id.toString();
             debugUserIdElement.textContent = "ID: " + telegramUserId;
-            loadPlayerData();
+            console.log("Telegram User ID obtained:", telegramUserId);
+            loadPlayerData(); // Викликаємо loadPlayerData ТУТ
         } else {
+            console.warn("Telegram User ID not available from tg.initDataUnsafe.user.id.");
             debugUserIdElement.textContent = "ID: Недоступний (тест)";
-            loadPlayerData();
+            loadPlayerData(); // Викликаємо loadPlayerData для тестового режиму
         }
     } else {
+        console.warn("Telegram Web App API not found. Please open in Telegram to get user ID.");
         debugUserIdElement.textContent = "ID: API Telegram не знайдено";
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
-            loadPlayerData();
+            loadPlayerData(); // Викликаємо loadPlayerData для тестового режиму
         }, 2000);
     }
+}
 
+
+// --- Event Listeners and Initial Load ---
+document.addEventListener('DOMContentLoaded', () => {
+    // startLoadingProgress() має бути викликана раніше,
+    // щоб екран завантаження відображався
     startLoadingProgress();
 
     // Click handler
@@ -211,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             score += clickPower;
             currentEnergy--;
             updateDisplay();
-            savePlayerData();
+            savePlayerData(); // Зберігаємо дані після кожного кліку
 
             try {
                 coinClickSound.currentTime = 0;
@@ -231,6 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             console.log("Energy depleted.");
+            // Тут можна додати візуальний фідбек для вичерпаної енергії,
+            // наприклад, показати спливаюче повідомлення "Енергія вичерпана!"
         }
     });
 
