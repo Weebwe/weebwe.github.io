@@ -15,7 +15,6 @@ const loadingText = document.getElementById('loadingText');
 const mainBalanceElement = document.getElementById('mainBalance');
 const energyBarFill = document.getElementById('energyBarFill');
 const energyText = document.getElementById('energyText');
-const coinImage = document.querySelector('.coin-image'); // Отримуємо посилання на зображення монети
 
 // Ігрові змінні
 let score = 0; // Монети для кліків
@@ -34,7 +33,7 @@ const energyRechargeIntervalTime = 5000; // Інтервал відновлен�
 let autoClickInterval;
 let energyRechargeInterval;
 
-const coinClickSound = new Audio('coin_click.mp3');
+const coinClickSound = new Audio('coin_click.mp3'); // Переконайтеся, що файл існує
 coinClickSound.volume = 0.5;
 
 // Функція оновлення відображення очок та балансів
@@ -73,7 +72,7 @@ function rechargeEnergy() {
             currentEnergy = maxEnergy;
         }
         updateEnergyDisplay();
-        savePlayerData(); // Зберігаємо енергію
+        savePlayerData(); // Зберігаємо енергію після відновлення
     }
 }
 
@@ -105,22 +104,20 @@ async function loadPlayerData() {
         if (docSnap.exists) {
             const data = docSnap.data();
             score = data.score || 0;
-            mainBalance = data.mainBalance || 0; // Завантажуємо основний баланс
+            mainBalance = data.mainBalance || 0;
             clickPower = data.clickPower || 1;
             autoClickPower = data.autoClickPower || 0;
             upgrade1Cost = data.upgrade1Cost || 100;
             upgrade2Cost = data.upgrade2Cost || 500;
-            currentEnergy = data.currentEnergy || maxEnergy; // Завантажуємо енергію
+            currentEnergy = data.currentEnergy || maxEnergy;
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
-            // Якщо даних немає, початкові значення вже встановлені
         }
 
-        // Оновлюємо відображення вартості покращень незалежно від того, завантажені дані чи ні
         upgrade1CostElement.textContent = upgrade1Cost;
         upgrade2CostElement.textContent = upgrade2Cost;
 
-        updateDisplay(); // Оновлюємо всі відображення після завантаження/ініціалізації
+        updateDisplay();
 
         // Запускаємо авто-клікер, якщо був активний
         if (autoClickPower > 0) {
@@ -142,7 +139,6 @@ async function loadPlayerData() {
 
     } catch (error) {
         console.error('Error loading player data:', error);
-        // Якщо сталася помилка завантаження, ініціалізуємо відображення
         upgrade1CostElement.textContent = upgrade1Cost;
         upgrade2CostElement.textContent = upgrade2Cost;
         updateDisplay();
@@ -164,12 +160,12 @@ async function savePlayerData() {
     try {
         await window.db.collection("players").doc(telegramUserId).set({
             score: score,
-            mainBalance: mainBalance, // Зберігаємо основний баланс
+            mainBalance: mainBalance,
             clickPower: clickPower,
             autoClickPower: autoClickPower,
             upgrade1Cost: upgrade1Cost,
             upgrade2Cost: upgrade2Cost,
-            currentEnergy: currentEnergy // Зберігаємо енергію
+            currentEnergy: currentEnergy
         });
         // console.log('Player data saved for', telegramUserId); // Закоментовано для зменшення логів
     } catch (error) {
@@ -183,7 +179,7 @@ function startLoadingProgress() {
     const interval = setInterval(() => {
         progress += Math.random() * 5; // Випадковий приріст
         if (progress > 99) {
-            progress = 99; // Залишаємо на 99% на 4 секунди
+            progress = 99; // Залишаємо на 99%
         }
         progressBarFill.style.width = `${progress}%`;
         loadingText.textContent = `Завантаження... ${Math.floor(progress)}%`;
@@ -288,4 +284,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Автоматичне збереження кожні 5 секунд
     setInterval(savePlayerData, 5000);
 });
-                                 
