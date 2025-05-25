@@ -291,4 +291,43 @@ h1 {
     .loading-logo {
         width: clamp(80px, 30vw, 150px); /* Зменшуємо лого на маленьких екранах */
     }
+    /* style.css */
+
+/* Додайте ці правила в кінець вашого style.css */
+
+.click-area:focus {
+    outline: none; /* Прибирає стандартний фокусний обвід */
+    box-shadow: none; /* Прибирає будь-яку тінь, яка може імітувати обвід */
+}
+
+.click-area:active {
+    outline: none; /* Також прибираємо для активного стану */
+    box-shadow: none;
+}
+
+/* Якщо ви хочете прибрати обвід для всіх кнопок, додайте наступне */
+button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+button:active {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Або більш загально для всіх інтерактивних елементів, але обережно: */
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    /* Якщо ви прибираєте outline, бажано додати альтернативний візуальний індикатор фокусу,
+       наприклад, змінити колір фону, тінь або рамку, щоб не погіршити доступність.
+       Наприклад:
+       border: 2px solid #fff;
+       box-shadow: 0 0 5px rgba(255,255,255,0.8);
+    */
+}
+    
 }
