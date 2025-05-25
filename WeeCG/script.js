@@ -1,3 +1,45 @@
+// script.js
+
+// --- Firebase Initialization START ---
+// Це ваші конфігураційні дані Firebase.
+// УВАГА: Публікація цих ключів у відкритому репозиторії GitHub НЕБЕЗПЕЧНА для реальних проектів.
+// Використовуйте цей метод тільки для ТЕСТУВАННЯ, якщо ви розумієте ризики,
+// або для приватних репозиторіїв.
+// Для продакшену потрібні більш складні рішення (наприклад, функція Firebase, проксі-сервер).
+const firebaseConfig = {
+  apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
+  authDomain: "weegamebot-7c44b.firebaseapp.com",
+  databaseURL: "https://weegamebot-7c44b-default-rtdb.firebaseio.com",
+  projectId: "weegamebot-7c44b",
+  storageBucket: "weegamebot-7c44b.firebasestorage.app",
+  messagingSenderId: "1052981895153",
+  appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
+};
+
+// Підключення Firebase SDK з CDN
+const firebaseAppScript = document.createElement('script');
+// Використовуємо стару версію Firebase SDK для сумісності з 'firebase.firestore()'
+// яка була вказана у вашому коді. Для нових версій використовується getFirestore().
+firebaseAppScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"; // Останній актуальний CDN шлях для v8
+firebaseAppScript.onload = () => {
+    const firebaseFirestoreScript = document.createElement('script');
+    firebaseFirestoreScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"; // Останній актуальний CDN шлях для v8
+    firebaseFirestoreScript.onload = () => {
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); // Використовуємо firebase.firestore() для Firebase SDK v8
+        window.db = db; // Зробити доступним глобально
+
+        console.log("Firebase Firestore initialized.");
+
+        // Тепер, коли Firebase ініціалізовано, завантажуємо дані та запускаємо інтервали
+        loadPlayerData(); // Цей виклик тепер безпечний
+    };
+    document.head.appendChild(firebaseFirestoreScript);
+};
+document.head.appendChild(firebaseAppScript);
+
+// --- Firebase Initialization END ---
+
 // Отримання посилань на HTML-елементи
 const scoreElement = document.getElementById('score');
 const clickButton = document.getElementById('clickButton');
@@ -76,13 +118,14 @@ function rechargeEnergy() {
 // Завантаження з Firestore
 async function loadPlayerData() {
     if (!window.db) {
-        console.error("Firestore не ініціалізований.");
+        console.error("Firestore не ініціалізований. (loadPlayerData)");
         updateDisplay();
         return;
     }
 
     if (!telegramUserId) {
-        telegramUserId = 'test_user_local';
+        console.warn("Telegram User ID not available for load. Running in test mode.");
+        telegramUserId = 'test_user_local'; // Встановлюємо тестовий ID, щоб гра не зупинялась
         updateDisplay();
         return;
     }
@@ -98,28 +141,40 @@ async function loadPlayerData() {
             upgrade1Cost = data.upgrade1Cost || 100;
             upgrade2Cost = data.upgrade2Cost || 500;
             currentEnergy = data.currentEnergy || maxEnergy;
+        } else {
+            console.log("No player data found for", telegramUserId, ". Starting new game.");
         }
+        updateDisplay();
 
+        // Запуск інтервалів ПІСЛЯ завантаження даних
         startAutoClicker();
         startEnergyRecharge();
-        updateDisplay();
+
     } catch (e) {
-        console.error('Помилка завантаження:', e);
+        console.error('Помилка завантаження даних гравця:', e);
         updateDisplay();
     }
 }
 
 // Збереження в Firestore
 async function savePlayerData() {
-    if (!window.db || telegramUserId === 'test_user_local') return;
+    if (!window.db) {
+        console.warn("Firestore не ініціалізований. Збереження неможливе.");
+        return;
+    }
+    if (telegramUserId === 'test_user_local' || !telegramUserId) { // Перевірка на null також
+        console.warn("Cannot save data: Telegram User ID is test ID or not available. Data will not be saved to Firestore.");
+        return;
+    }
 
     try {
         await window.db.collection("players").doc(telegramUserId).set({
             score, mainBalance, clickPower, autoClickPower,
             upgrade1Cost, upgrade2Cost, currentEnergy
         });
+        // console.log("Player data saved for", telegramUserId); // Закоментовано для чистоти логів
     } catch (e) {
-        console.error("Помилка збереження:", e);
+        console.error("Помилка збереження даних гравця:", e);
     }
 }
 
@@ -154,7 +209,7 @@ function startLoadingProgress() {
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
                 gameScreen.classList.remove('hidden');
-                loadPlayerData();
+                // loadPlayerData() та інші інтервали тепер викликаються з Firebase onload
             }, 4000);
         }
     }, 50);
@@ -162,27 +217,32 @@ function startLoadingProgress() {
 
 // Старт при завантаженні
 document.addEventListener('DOMContentLoaded', () => {
+    // Ініціалізація Telegram Web App API та отримання ID користувача
     if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
         tg.ready();
-        setTimeout(() => tg.expand(), 100);
+        setTimeout(() => tg.expand(), 100); // Розширюємо Web App на весь екран
 
         if (tg.initDataUnsafe?.user?.id) {
             telegramUserId = tg.initDataUnsafe.user.id.toString();
             debugUserIdElement.textContent = "ID: " + telegramUserId;
+            console.log("Telegram User ID obtained:", telegramUserId);
         } else {
+            console.warn("Telegram User ID not available from tg.initDataUnsafe.user.id.");
             debugUserIdElement.textContent = "ID: Недоступний (тест)";
         }
     } else {
+        console.warn("Telegram Web App API not found. Please open in Telegram to get user ID.");
         debugUserIdElement.textContent = "ID: API Telegram не знайдено";
+        // Для тестування без Telegram, показуємо гру
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
-            loadPlayerData();
+            // loadPlayerData() та інші інтервали тепер викликаються зсередини Firebase onload, а не тут
         }, 2000);
     }
 
-    startLoadingProgress();
+    startLoadingProgress(); // Запускаємо процес завантаження при старті
 
     // Обробник кліку
     clickButton.addEventListener('click', () => {
@@ -195,8 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 coinClickSound.currentTime = 0;
                 coinClickSound.play();
             } catch (e) {
-                console.error("Помилка звуку:", e);
+                console.error("Помилка відтворення звуку:", e);
             }
+        } else {
+            console.log("Енергія вичерпана!");
         }
     });
 
@@ -215,11 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade2Cost;
             autoClickPower += 1;
             upgrade2Cost = Math.floor(upgrade2Cost * 2);
-            startAutoClicker();
+            startAutoClicker(); // Перезапускаємо автоклікер з новою потужністю
             updateDisplay();
             savePlayerData();
         }
     });
 
-    setInterval(savePlayerData, 5000);
+    setInterval(savePlayerData, 5000); // Автоматичне збереження кожні 5 секунд
 });
