@@ -1,6 +1,6 @@
-// script.js - Оновлена версія з виправленнями енергії та Firebase
+// script.js - Оновлена версія з логікою відновлення енергії тільки з 0
 
-// --- Firebase Initialization START ---
+// ... (Ваша Firebase Initialization START блок залишається без змін) ...
 const firebaseConfig = {
   apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
   authDomain: "weegamebot-7c44b.firebaseapp.com",
@@ -11,7 +11,6 @@ const firebaseConfig = {
   appId: "1:1052981895153:web:0c8426bf8e5b97729a6e50"
 };
 
-// Зробимо db глобальною змінною
 let db;
 
 const firebaseAppScript = document.createElement('script');
@@ -21,10 +20,8 @@ firebaseAppScript.onload = () => {
     firebaseFirestoreScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js";
     firebaseFirestoreScript.onload = () => {
         const app = firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore(); // Присвоюємо db до глобальної змінної
+        db = firebase.firestore();
         console.log("Firebase Firestore initialized.");
-
-        // Ініціалізуємо гру ТІЛЬКИ ПІСЛЯ того, як Firebase повністю завантажився
         initializeGameAfterFirebase();
     };
     document.head.appendChild(firebaseFirestoreScript);
@@ -47,7 +44,7 @@ const progressBarFill = document.getElementById('progressBarFill');
 const loadingText = document.getElementById('loadingText');
 
 const mainBalanceElement = document.getElementById('mainBalance');
-const energyBarFill = document = document.getElementById('energyBarFill');
+const energyBarFill = document.getElementById('energyBarFill'); // Виправлено: getElementById
 const energyText = document.getElementById('energyText');
 
 // --- Game Variables ---
@@ -61,7 +58,8 @@ let telegramUserId = null;
 
 let currentEnergy = 100;    // ПОЧАТКОВА ЕНЕРГІЯ = 100
 const maxEnergy = 100;      // МАКСИМАЛЬНА ЕНЕРГІЯ = 100
-let lastEnergyRechargeTime = 0; // Час останнього повного відновлення або витрачання енергії
+// Ця змінна тепер буде зберігати час, коли енергія стала 0.
+let lastEnergyZeroTime = 0; 
 let autoClickInterval;
 
 const coinClickSound = new Audio('coin_click.mp3');
@@ -92,30 +90,33 @@ function checkUpgradeAvailability() {
     upgrade2Button.disabled = score < upgrade2Cost;
 }
 
-// --- Energy Recharge Logic ---
+// --- Energy Recharge Logic (ОНОВЛЕНО) ---
 function rechargeEnergyOncePerDay() {
     const now = Date.now();
     const fullDayInMs = 24 * 60 * 60 * 1000;
 
-    // Якщо енергія не повна І минуло 24 години з моменту останнього відновлення/витрачання
-    if (currentEnergy < maxEnergy && (now - lastEnergyRechargeTime >= fullDayInMs)) {
-        currentEnergy = maxEnergy; // Відновлюємо енергію до максимуму
-        lastEnergyRechargeTime = now; // Оновлюємо час останнього повного відновлення
+    // Енергія відновлюється, тільки якщо вона ДОСЯГЛА 0 І пройшло 24 години
+    if (currentEnergy === 0 && (now - lastEnergyZeroTime >= fullDayInMs)) {
+        currentEnergy = maxEnergy; // Повне відновлення
+        lastEnergyZeroTime = now; // Оновлюємо час, коли вона знову стала повною (або була відновлена)
         updateEnergyDisplay();
         savePlayerData();
-        console.log("Energy fully recharged after 24 hours.");
-        // Тут можна додати спливаюче повідомлення "Енергія відновлена!"
-    } else {
-        // Якщо енергія не повна, але 24 години ще не минули, або енергія вже повна.
-        // Ми не змінюємо lastEnergyRechargeTime тут, щоб не скидати відлік.
-        if (currentEnergy < maxEnergy) {
-            const timeLeftMs = fullDayInMs - (now - lastEnergyRechargeTime);
+        console.log("Energy fully recharged after 24 hours of being 0.");
+        // Можливо, тут можна показати спливаюче повідомлення "Енергія відновлена!"
+    } else if (currentEnergy === 0) {
+        // Якщо енергія 0, але 24 години ще не минули, показуємо час, що залишився
+        const timeLeftMs = fullDayInMs - (now - lastEnergyZeroTime);
+        if (timeLeftMs > 0) {
             const timeLeftHours = Math.floor(timeLeftMs / (1000 * 60 * 60));
             const timeLeftMinutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
-            console.log(`Energy not yet fully recharged. Time left: ${timeLeftHours}h ${timeLeftMinutes}m`);
+            console.log(`Energy depleted. Recharges in: ${timeLeftHours}h ${timeLeftMinutes}m`);
         } else {
-            console.log("Energy is already full.");
+            // Це має бути досягнуто, якщо пройшло 24 години, але функція не спрацювала
+            console.log("Energy depleted and 24 hours passed, but not recharged yet.");
         }
+    } else {
+        // Якщо енергія не 0, ми не робимо нічого з її відновленням.
+        console.log("Energy is not 0, no recharge countdown active.");
     }
 }
 
@@ -141,20 +142,22 @@ async function loadPlayerData() {
             mainBalance = data.mainBalance || 0;
             clickPower = data.clickPower || 1;
             autoClickPower = data.autoClickPower || 0;
+            currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : maxEnergy;
             upgrade1Cost = data.upgrade1Cost || 100;
             upgrade2Cost = data.upgrade2Cost || 500;
-            currentEnergy = data.currentEnergy || maxEnergy;
-            // Важливо: встановлюємо lastEnergyRechargeTime на Date.now()
-            // якщо його немає або воно нульове, щоб почати відлік для нового гравця
-            lastEnergyRechargeTime = data.lastEnergyRechargeTime || Date.now();
+            
+            // НОВЕ: Завантажуємо lastEnergyZeroTime
+            // Якщо його немає, встановлюємо на поточний час, якщо енергія 0, інакше 0
+            lastEnergyZeroTime = data.lastEnergyZeroTime || (currentEnergy === 0 ? Date.now() : 0);
+
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
-            // Для нового гравця встановлюємо lastEnergyRechargeTime на поточний час
-            lastEnergyRechargeTime = Date.now();
+            // Для нового гравця енергія повна, тому lastEnergyZeroTime = 0
+            lastEnergyZeroTime = 0; 
         }
         updateDisplay();
         startAutoClicker();
-        rechargeEnergyOncePerDay(); // Викликаємо при завантаженні, щоб перевірити поповнення
+        rechargeEnergyOncePerDay(); // Перевіряємо енергію при завантаженні
     } catch (e) {
         console.error("Error loading player data:", e);
         updateDisplay();
@@ -163,29 +166,26 @@ async function loadPlayerData() {
 
 async function savePlayerData() {
     if (!db || !telegramUserId || telegramUserId === 'test_user_local') {
-        // console.warn("Cannot save data: Firestore not initialized or Telegram User ID is test ID/not available.");
         return;
     }
     try {
         await db.collection("players").doc(telegramUserId).set({
             score, mainBalance, clickPower, autoClickPower,
             upgrade1Cost, upgrade2Cost, currentEnergy,
-            lastEnergyRechargeTime
+            lastEnergyZeroTime // НОВЕ: Зберігаємо lastEnergyZeroTime
         }, { merge: true });
-        // console.log("Player data saved for", telegramUserId);
     } catch (e) {
         console.error("Error saving player data:", e);
     }
 }
 
-// --- Autoclicker ---
+// ... (Ваш Autoclicker та Loading Screen блоки залишаються без змін) ...
 function startAutoClicker() {
     if (autoClickInterval) clearInterval(autoClickInterval);
     if (autoClickPower > 0) {
         autoClickInterval = setInterval(() => {
             score += autoClickPower;
             updateDisplay();
-            // Зберігаємо дані тут, тільки якщо це не тестовий користувач
             if (telegramUserId !== 'test_user_local') {
                 savePlayerData();
             }
@@ -193,7 +193,6 @@ function startAutoClicker() {
     }
 }
 
-// --- Loading Screen ---
 function startLoadingProgress() {
     let progress = 0;
     const interval = setInterval(() => {
@@ -211,8 +210,8 @@ function startLoadingProgress() {
     }, 50);
 }
 
+
 // --- Main Game Initialization Logic ---
-// Ця функція викликається, коли Firebase повністю ініціалізовано
 function initializeGameAfterFirebase() {
     if (window.Telegram?.WebApp) {
         const tg = window.Telegram.WebApp;
@@ -223,11 +222,11 @@ function initializeGameAfterFirebase() {
             telegramUserId = tg.initDataUnsafe.user.id.toString();
             debugUserIdElement.textContent = "ID: " + telegramUserId;
             console.log("Telegram User ID obtained:", telegramUserId);
-            loadPlayerData(); // Викликаємо loadPlayerData ТУТ, після отримання ID
+            loadPlayerData();
         } else {
             console.warn("Telegram User ID not available from tg.initDataUnsafe.user.id.");
             debugUserIdElement.textContent = "ID: Недоступний (тест)";
-            loadPlayerData(); // Викликаємо loadPlayerData для тестового режиму
+            loadPlayerData();
         }
     } else {
         console.warn("Telegram Web App API not found. Please open in Telegram to get user ID.");
@@ -235,15 +234,14 @@ function initializeGameAfterFirebase() {
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
-            loadPlayerData(); // Викликаємо loadPlayerData для тестового режиму
+            loadPlayerData();
         }, 2000);
     }
 }
 
 
-// --- Event Listeners and Initial Setup ---
+// --- Event Listeners and Initial Setup (ОНОВЛЕНО clickButton.addEventListener) ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Запускаємо прогрес завантаження одразу
     startLoadingProgress();
 
     // Click handler for the main coin
@@ -252,13 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
             score += clickPower;
             currentEnergy--;
             updateDisplay();
-            savePlayerData(); // Зберігаємо дані після кожного кліку
-
-            // Оновлюємо lastEnergyRechargeTime, якщо енергія була витрачена
-            // Це починає відлік 24 годин для наступного повного відновлення
-            if (currentEnergy < maxEnergy) {
-                lastEnergyRechargeTime = Date.now();
+            
+            // НОВЕ: Якщо енергія щойно стала 0, фіксуємо цей час
+            if (currentEnergy === 0) {
+                lastEnergyZeroTime = Date.now();
+                console.log("Energy hit 0. Recording time:", lastEnergyZeroTime);
             }
+            savePlayerData(); // Зберігаємо дані після кожного кліку
 
             try {
                 coinClickSound.currentTime = 0;
@@ -283,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Upgrade buttons
+    // Upgrade buttons (без змін)
     upgrade1Button.addEventListener('click', () => {
         if (score >= upgrade1Cost) {
             score -= upgrade1Cost;
@@ -291,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
             upgrade1Cost = Math.floor(upgrade1Cost * 1.5);
             updateDisplay();
             savePlayerData();
-            // Тут можна додати звук для апгрейду
         }
     });
 
@@ -300,13 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
             score -= upgrade2Cost;
             autoClickPower += 1;
             upgrade2Cost = Math.floor(upgrade2Cost * 2);
-            startAutoClicker(); // Перезапускаємо автоклікер з новою потужністю
+            startAutoClicker();
             updateDisplay();
             savePlayerData();
-            // Тут можна додати звук для апгрейду
         }
     });
 
-    // Autosave data every 5 seconds
     setInterval(savePlayerData, 5000);
 });
