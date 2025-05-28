@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WeeGame Bot</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -18,17 +18,20 @@
     </div>
 
     <div id="main-content-wrapper">
-        <div id="game-screen" class="screen hidden main-screen">
+        <div id="game-screen" class="screen hidden">
             <div class="header">
                 <span class="balance">WEE: <span id="mainBalance">0.00</span></span>
             </div>
+
             <div class="score-area">
                 <span id="score">0</span> 🪙
             </div>
+
             <div class="energy-bar-container">
                 <div id="energyBarFill" class="energy-bar-fill"></div>
                 <div id="energyText" class="energy-text">🔋 100 / 100</div>
             </div>
+
             <button id="clickButton" class="main-click-button">Клік!</button>
 
             <div class="upgrades-container">
@@ -44,7 +47,7 @@
             </div>
         </div>
 
-        <div id="wallet-screen" class="screen hidden main-screen">
+        <div id="wallet-screen" class="screen hidden">
             <h2>Мій Гаманець</h2>
             <div class="balance-info">
                 <p>Баланс WEE: <span id="weeBalance">0.00</span></p>
@@ -52,25 +55,23 @@
             </div>
             <div class="exchange-section">
                 <h3>Обмін Монет на WEE</h3>
-                <p>Курс: 1 WEE = <span id="exchangeRate">${WEE_EXCHANGE_RATE.toLocaleString()}</span> монет</p>
+                <p>Курс: 1 WEE = 1,000,000 монет</p>
                 <input type="number" id="exchangeAmount" placeholder="Кількість монет для обміну">
                 <button id="exchangeButton">Обміняти</button>
             </div>
         </div>
 
-        <div id="leaderboard-screen" class="screen hidden main-screen">
+        <div id="leaderboard-screen" class="screen hidden">
             <h2>Лідерборд</h2>
-            <button id="refreshLeaderboard">Оновити</button>
+            <button id="refreshLeaderboard">Оновити</magneticButton>
             <ul id="leaderboardList" class="leaderboard-list">
-                <li>Завантаження лідерборду...</li>
-            </ul>
+                </ul>
         </div>
 
-        <div id="tasks-screen" class="screen hidden main-screen">
+        <div id="tasks-screen" class="screen hidden">
             <h2>Завдання</h2>
-            <ul id="tasksList" class="tasks-list">
-                <li>Завантаження завдань...</li>
-            </ul>
+            <div id="tasksList" class="tasks-list">
+                </div>
         </div>
     </div> <nav class="bottom-nav">
         <div class="nav-item active" data-screen="game">
