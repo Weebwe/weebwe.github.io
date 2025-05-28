@@ -1,4 +1,4 @@
-// script.js - Оновлена версія для коректної роботи Firebase та логіки гри
+// script.js - Повна інтегрована версія з Firebase та додатковими сторінками
 
 // --- Firebase Initialization START ---
 const firebaseConfig = {
@@ -20,7 +20,6 @@ let firebaseInitialized = false; // Флаг стану ініціалізаці
  */
 const loadFirebaseSDK = () => {
     return new Promise((resolve, reject) => {
-        // Перевіряємо, чи Firebase вже завантажений, щоб уникнути повторного завантаження
         if (typeof firebase !== 'undefined' && firebase.apps.length) {
             db = firebase.firestore();
             firebaseInitialized = true;
@@ -60,23 +59,43 @@ const loadFirebaseSDK = () => {
 };
 // --- Firebase Initialization END ---
 
-// --- DOM Elements ---
+// --- DOM Elements (Game Screen) ---
 const scoreElement = document.getElementById('score');
 const clickButton = document.getElementById('clickButton');
 const upgrade1Button = document.getElementById('upgrade1');
 const upgrade1CostElement = document.getElementById('upgrade1Cost');
 const upgrade2Button = document.getElementById('upgrade2');
 const upgrade2CostElement = document.getElementById('upgrade2Cost');
-const debugUserIdElement = document.getElementById('debugUserId');
+const debugUserIdElement = document.getElementById('debugUserId'); // Для налагодження Telegram ID
 
 const loadingScreen = document.getElementById('loading-screen');
 const gameScreen = document.getElementById('game-screen');
 const progressBarFill = document.getElementById('progressBarFill');
 const loadingText = document.getElementById('loadingText');
 
-const mainBalanceElement = document.getElementById('mainBalance'); // Для WEE Balance
+const mainBalanceElement = document.getElementById('mainBalance'); // Для WEE Balance на головному екрані
 const energyBarFill = document.getElementById('energyBarFill');
 const energyText = document.getElementById('energyText');
+
+// --- DOM Elements (Wallet Screen) ---
+const walletScreen = document.getElementById('wallet-screen');
+const weeBalanceDisplay = document.getElementById('weeBalance');
+const walletCoinBalanceDisplay = document.getElementById('walletCoinBalance');
+const exchangeAmountInput = document.getElementById('exchangeAmount');
+const exchangeButton = document.getElementById('exchangeButton');
+
+// --- DOM Elements (Leaderboard Screen) ---
+const leaderboardScreen = document.getElementById('leaderboard-screen');
+const leaderboardList = document.getElementById('leaderboardList');
+const refreshLeaderboardButton = document.getElementById('refreshLeaderboard');
+
+// --- DOM Elements (Tasks Screen) ---
+const tasksScreen = document.getElementById('tasks-screen');
+const tasksList = document.getElementById('tasksList');
+
+// --- Bottom Navigation ---
+const navItems = document.querySelectorAll('.nav-item');
+
 
 // --- Game Variables ---
 let score = 0;
@@ -92,8 +111,21 @@ let currentEnergy = MAX_ENERGY;
 let lastEnergyRechargeTime = 0; // Unix timestamp
 let autoClickInterval = null;
 
-const coinClickSound = new Audio('coin_click.mp3'); 
+const WEE_EXCHANGE_RATE = 1000000; // 1,000,000 монет = 1 WEE
+
+const coinClickSound = new Audio('coin_click.mp3');
 coinClickSound.volume = 0.5;
+
+// --- Task Data (Defined locally, ideally would come from backend/Firebase config) ---
+// Примітка: В реальному додатку список завдань може бути динамічним або завантажуватися з Firebase.
+const allAvailableTasks = [
+    { id: 'task1', name: "Привітання", description: "Підпишіться на наш Telegram-канал.", reward: "500 🪙", type: "coins", value: 500 },
+    { id: 'task2', name: "Перша покупка", description: "Купіть будь-яке покращення.", reward: "0.5 WEE", type: "wee", value: 0.5 },
+    { id: 'task3', name: "Запроси друга", description: "Запросіть одного друга в гру.", reward: "1.0 WEE", type: "wee", value: 1.0 },
+    { id: 'task4', name: "Натисни 1000 разів", description: "Клікніть монету 1000 разів.", reward: "1000 🪙", type: "coins", value: 1000 },
+    { id: 'task5', name: "Досягни 10000 монет", description: "Назбирайте 10000 монет.", reward: "0.1 WEE", type: "wee", value: 0.1 },
+];
+let playerTasksStatus = {}; // Зберігатиме { 'taskId': true/false }
 
 // --- UI Update ---
 function updateDisplay() {
@@ -103,6 +135,12 @@ function updateDisplay() {
     upgrade2CostElement.textContent = Math.floor(upgrade2Cost).toLocaleString();
     checkUpgradeAvailability();
     updateEnergyDisplay();
+
+    // Оновлення елементів Wallet Screen
+    if (!walletScreen.classList.contains('hidden')) {
+        weeBalanceDisplay.textContent = parseFloat(mainBalance).toFixed(2);
+        walletCoinBalanceDisplay.textContent = Math.floor(score).toLocaleString();
+    }
 }
 
 function updateEnergyDisplay() {
@@ -111,7 +149,6 @@ function updateEnergyDisplay() {
     const icon = currentEnergy <= 0 ? '🪫' : '🔋';
     energyText.textContent = `${icon} ${Math.floor(currentEnergy)} / ${MAX_ENERGY}`;
 
-    // Візуальний фідбек при вичерпанні енергії
     if (currentEnergy <= 0) {
         clickButton.disabled = true;
         clickButton.classList.add('no-energy');
@@ -129,7 +166,7 @@ function checkUpgradeAvailability() {
 // --- Energy Recharge Logic ---
 function rechargeEnergyLogic() {
     const now = Date.now();
-    const fullDay = 24 * 60 * 60 * 1000; // 24 години в мілісекундах
+    const fullDay = 24 * 60 * 60 * 1000;
 
     if (currentEnergy < MAX_ENERGY && (now - lastEnergyRechargeTime) >= fullDay) {
         currentEnergy = MAX_ENERGY;
@@ -138,7 +175,6 @@ function rechargeEnergyLogic() {
         savePlayerData();
         console.log("Energy recharged to max.");
     } else if (currentEnergy === MAX_ENERGY) {
-        // Якщо енергія вже повна, оновлюємо час, щоб наступний відлік був коректним
         lastEnergyRechargeTime = now;
         savePlayerData();
     }
@@ -149,8 +185,7 @@ async function loadPlayerData() {
     console.log("Attempting to load player data...");
     if (!firebaseInitialized || !db) {
         console.error("Firestore not initialized or Firebase not ready. Cannot load player data.");
-        // Показуємо гру з початковими даними, якщо Firebase недоступний
-        telegramUserId = 'test_user_local'; // Встановлюємо тестовий ID, щоб гра запустилася
+        telegramUserId = 'test_user_local';
         debugUserIdElement.textContent = "ID: Недоступний (локальний тест)";
         updateDisplay();
         startAutoClicker();
@@ -161,7 +196,7 @@ async function loadPlayerData() {
 
     if (!telegramUserId) {
         console.warn("Telegram User ID not available for load. Running in test mode.");
-        telegramUserId = 'test_user_local'; // Встановлюємо тестовий ID для розробки
+        telegramUserId = 'test_user_local';
         debugUserIdElement.textContent = "ID: Недоступний (локальний тест)";
     } else {
         debugUserIdElement.textContent = "ID: " + telegramUserId;
@@ -178,30 +213,30 @@ async function loadPlayerData() {
             upgrade1Cost = data.upgrade1Cost || 100;
             upgrade2Cost = data.upgrade2Cost || 500;
             currentEnergy = data.currentEnergy || MAX_ENERGY;
-            lastEnergyRechargeTime = data.lastEnergyRechargeTime || Date.now(); // Якщо немає, встановлюємо зараз
+            lastEnergyRechargeTime = data.lastEnergyRechargeTime || Date.now();
+            playerTasksStatus = data.tasks || {}; // Завантажуємо статус завдань
             console.log("Player data loaded for", telegramUserId, ":", data);
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
-            lastEnergyRechargeTime = Date.now(); // Для нового гравця встановлюємо поточний час
+            lastEnergyRechargeTime = Date.now();
+            // Ініціалізуємо порожній статус завдань для нового гравця
+            playerTasksStatus = {};
         }
         updateDisplay();
         startAutoClicker();
-        rechargeEnergyLogic(); // Застосовуємо логіку перезарядки після завантаження/ініціалізації даних
+        rechargeEnergyLogic();
     } catch (e) {
         console.error("Error loading player data:", e);
-        // Якщо помилка завантаження, все одно показуємо гру з початковими даними
         updateDisplay();
         startAutoClicker();
         rechargeEnergyLogic();
     } finally {
-        hideLoadingScreen(); // Завжди приховуємо екран завантаження після спроби завантаження даних
+        hideLoadingScreen();
     }
 }
 
 async function savePlayerData() {
-    // Зберігаємо дані тільки якщо Firebase ініціалізований і є реальний telegramUserId
     if (!firebaseInitialized || !db || !telegramUserId || telegramUserId === 'test_user_local') {
-        // console.warn("Cannot save data: Firestore not initialized or Telegram User ID is test ID/not available.");
         return;
     }
     try {
@@ -213,7 +248,8 @@ async function savePlayerData() {
             upgrade1Cost: Math.floor(upgrade1Cost),
             upgrade2Cost: Math.floor(upgrade2Cost),
             currentEnergy: Math.floor(currentEnergy),
-            lastEnergyRechargeTime
+            lastEnergyRechargeTime,
+            tasks: playerTasksStatus // Зберігаємо статус завдань
         }, { merge: true });
         // console.log("Player data saved for", telegramUserId);
     } catch (e) {
@@ -223,12 +259,12 @@ async function savePlayerData() {
 
 // --- Autoclicker ---
 function startAutoClicker() {
-    if (autoClickInterval) clearInterval(autoClickInterval); // Очищаємо попередній інтервал
+    if (autoClickInterval) clearInterval(autoClickInterval);
     if (autoClickPower > 0) {
         autoClickInterval = setInterval(() => {
             score += autoClickPower;
             updateDisplay();
-        }, 1000); // Кожну секунду
+        }, 1000);
     }
 }
 
@@ -236,14 +272,13 @@ function startAutoClicker() {
 function startLoadingProgress() {
     let progress = 0;
     const interval = setInterval(() => {
-        progress += Math.random() * 5; // Невеликий випадковий приріст для "живості"
-        if (progress > 95) progress = 95; // Максимум 95%, щоб останні 5% дочекалися Firebase
+        progress += Math.random() * 5;
+        if (progress > 95) progress = 95;
         progressBarFill.style.width = `${progress}%`;
         loadingText.textContent = `Завантаження... ${Math.floor(progress)}%`;
 
         if (progress >= 95 && firebaseInitialized) {
             clearInterval(interval);
-            // Прогрес зупиняється на 95%, решта 5% чекає на initializeGameAfterFirebase()
         }
     }, 50);
 }
@@ -251,7 +286,183 @@ function startLoadingProgress() {
 function hideLoadingScreen() {
     console.log("Hiding loading screen and showing game screen.");
     loadingScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
+    gameScreen.classList.remove('hidden'); // Показуємо початковий екран гри
+}
+
+// --- Wallet Screen Logic ---
+exchangeButton.addEventListener('click', async () => {
+    const amountToExchange = parseInt(exchangeAmountInput.value);
+
+    if (isNaN(amountToExchange) || amountToExchange < WEE_EXCHANGE_RATE) {
+        alert(`Будь ласка, введіть суму, більшу або рівну ${WEE_EXCHANGE_RATE.toLocaleString()} монет.`);
+        return;
+    }
+
+    if (score >= amountToExchange) {
+        const weeEarned = amountToExchange / WEE_EXCHANGE_RATE;
+        score -= amountToExchange;
+        mainBalance += weeEarned; // Оновлюємо WEE баланс
+
+        alert(`Успішно обміняно ${amountToExchange.toLocaleString()} монет на ${weeEarned.toFixed(2)} WEE!`);
+        exchangeAmountInput.value = ''; // Очищаємо поле вводу
+        updateDisplay();
+        savePlayerData(); // Зберігаємо оновлені баланси
+    } else {
+        alert('Недостатньо монет для обміну!');
+    }
+});
+
+// --- Leaderboard Screen Logic ---
+refreshLeaderboardButton.addEventListener('click', () => {
+    fetchLeaderboardData();
+});
+
+async function fetchLeaderboardData() {
+    leaderboardList.innerHTML = '<li style="text-align:center;">Завантаження лідерборду...</li>';
+    if (!firebaseInitialized || !db) {
+        leaderboardList.innerHTML = '<li style="text-align:center;">Помилка: Firebase не ініціалізовано.</li>';
+        console.error("Cannot fetch leaderboard: Firebase not initialized.");
+        return;
+    }
+
+    try {
+        // Отримання топ-N гравців з Firebase, відсортованих за score
+        // Примітка: Для великої кількості гравців таку операцію краще робити через Cloud Functions
+        // або використовувати Firebase Realtime Database для лідербордів.
+        // Також потрібні правила безпеки Firebase, які дозволяють читати "score" інших гравців.
+        const playersRef = db.collection("players");
+        const snapshot = await playersRef.orderBy("score", "desc").limit(20).get(); // Отримуємо топ-20
+
+        const leaders = [];
+        let rank = 1;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            // Виключаємо тестових користувачів з лідерборду, якщо це не потрібно
+            if (doc.id === 'test_user_local') return;
+
+            // Можна додати ім'я користувача, якщо воно зберігається в даних про гравця,
+            // інакше використовуємо ID або просто "Гравець N"
+            let playerName = data.name || `Гравець ${rank}`;
+            if (doc.id === telegramUserId) {
+                playerName = "Ви"; // Позначаємо поточного гравця
+            }
+
+            leaders.push({
+                rank: rank++,
+                name: playerName,
+                score: data.score || 0
+            });
+        });
+        displayLeaderboard(leaders);
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        leaderboardList.innerHTML = '<li style="text-align:center;">Не вдалося завантажити лідерборд.</li>';
+    }
+}
+
+function displayLeaderboard(leaders) {
+    leaderboardList.innerHTML = '';
+    if (leaders.length === 0) {
+        leaderboardList.innerHTML = '<li style="text-align:center;">Лідерборд порожній.</li>';
+        return;
+    }
+    leaders.forEach(leader => {
+        const li = document.createElement('li');
+        li.classList.add('leaderboard-item');
+        // Додаємо клас 'current-player' для виділення поточного гравця
+        if (leader.name === "Ви") {
+            li.classList.add('current-player');
+        }
+        li.innerHTML = `
+            <span class="rank">${leader.rank}.</span>
+            <span class="name">${leader.name}</span>
+            <span class="score">${leader.score.toLocaleString()} 🪙</span>
+        `;
+        leaderboardList.appendChild(li);
+    });
+}
+
+// --- Tasks Screen Logic ---
+async function fetchTasksData() {
+    tasksList.innerHTML = '<li style="text-align:center;">Завантаження завдань...</li>';
+    if (!firebaseInitialized || !db) {
+        tasksList.innerHTML = '<li style="text-align:center;">Помилка: Firebase не ініціалізовано.</li>';
+        console.error("Cannot fetch tasks: Firebase not initialized.");
+        return;
+    }
+
+    // Отримуємо поточний статус завдань користувача з playerTasksStatus, який завантажується з Firebase
+    const tasksToDisplay = allAvailableTasks.map(task => ({
+        ...task,
+        completed: playerTasksStatus[task.id] === true
+    }));
+    displayTasks(tasksToDisplay);
+}
+
+function displayTasks(tasks) {
+    tasksList.innerHTML = '';
+    if (tasks.length === 0) {
+        tasksList.innerHTML = '<li style="text-align:center;">Наразі немає доступних завдань.</li>';
+        return;
+    }
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.classList.add('task-item');
+        li.innerHTML = `
+            <h3>${task.name}</h3>
+            <p>${task.description}</p>
+            <span class="reward">Нагорода: ${task.reward}</span>
+            <button data-task-id="${task.id}" ${task.completed ? 'disabled' : ''}>
+                ${task.completed ? 'Виконано' : 'Виконати'}
+            </button>
+        `;
+        tasksList.appendChild(li);
+
+        const taskButton = li.querySelector('button');
+        if (!task.completed) {
+            taskButton.addEventListener('click', async (e) => {
+                e.target.disabled = true; // Вимикаємо кнопку, щоб уникнути повторних кліків
+                await completeTask(task.id, task.type, task.value, task.reward);
+                // Після виконання завдання, оновимо список завдань, щоб кнопка стала "Виконано"
+                fetchTasksData();
+            });
+        }
+    });
+}
+
+async function completeTask(taskId, taskType, rewardValue, rewardString) {
+    if (!telegramUserId || telegramUserId === 'test_user_local') {
+        alert("Неможливо виконати завдання в тестовому режимі. Будь ласка, відкрийте гру в Telegram.");
+        return;
+    }
+    if (playerTasksStatus[taskId]) {
+        alert("Це завдання вже виконано!");
+        return;
+    }
+
+    try {
+        // У реальному додатку тут потрібна серверна перевірка виконання умови завдання
+        // (наприклад, чи дійсно підписався на канал, чи запросив друга).
+        // Для демонстрації ми просто позначаємо його як виконане.
+
+        playerTasksStatus[taskId] = true; // Позначаємо як виконане локально
+
+        if (taskType === 'coins') {
+            score += rewardValue;
+        } else if (taskType === 'wee') {
+            mainBalance += rewardValue;
+        }
+
+        updateDisplay();
+        await savePlayerData(); // Зберігаємо оновлений статус завдань та баланси
+
+        alert(`Завдання "${allAvailableTasks.find(t => t.id === taskId).name}" виконано! Отримано: ${rewardString}`);
+
+    } catch (error) {
+        console.error('Error completing task:', error);
+        playerTasksStatus[taskId] = false; // Якщо помилка, повертаємо статус
+        alert('Помилка при виконанні завдання. Спробуйте пізніше.');
+    }
 }
 
 
@@ -263,7 +474,7 @@ async function initializeGame() {
     if (window.Telegram?.WebApp) {
         const tg = window.Telegram.WebApp;
         tg.ready();
-        setTimeout(() => tg.expand(), 100); // Розширюємо Web App
+        setTimeout(() => tg.expand(), 100);
 
         if (tg.initDataUnsafe?.user?.id) {
             telegramUserId = tg.initDataUnsafe.user.id.toString();
@@ -284,8 +495,7 @@ async function initializeGame() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM Content Loaded.");
 
-    // Запускаємо анімацію прогрес-бару одразу
-    startLoadingProgress();
+    startLoadingProgress(); // Запускаємо анімацію прогрес-бару одразу
 
     // Завантажуємо Firebase SDK, а потім ініціалізуємо гру
     loadFirebaseSDK()
@@ -294,114 +504,4 @@ document.addEventListener('DOMContentLoaded', () => {
             initializeGame();
         })
         .catch(error => {
-            console.error("Failed to load Firebase SDK or initialize game:", error);
-            loadingText.textContent = "Помилка завантаження гри. Спробуйте пізніше.";
-            progressBarFill.style.width = '0%';
-            // Якщо Firebase не завантажився, показуємо гру в тестовому режимі
-            telegramUserId = 'test_user_local';
-            debugUserIdElement.textContent = "ID: Помилка Firebase (локальний тест)";
-            updateDisplay();
-            startAutoClicker();
-            rechargeEnergyLogic();
-            hideLoadingScreen(); // Приховуємо екран завантаження, навіть якщо Firebase не працює
-        });
-
-    // --- Click handler ---
-    clickButton.addEventListener('click', (event) => {
-        if (currentEnergy > 0) {
-            score += clickPower;
-            currentEnergy--;
-            updateDisplay();
-            savePlayerData(); // Зберігаємо дані після кожного кліку
-
-            try {
-                coinClickSound.currentTime = 0;
-                coinClickSound.play();
-            } catch (e) {
-                console.error("Sound error:", e);
-            }
-
-            const floatingText = document.createElement('div');
-            floatingText.classList.add('floating-text');
-            floatingText.textContent = `+${clickPower}`;
-            floatingText.style.left = `${event.clientX}px`;
-            floatingText.style.top = `${event.clientY - 20}px`;
-            gameScreen.appendChild(floatingText); // Додаємо до gameScreen, щоб була правильна позиція
-            floatingText.addEventListener('animationend', () => {
-                floatingText.remove();
-            });
-        } else {
-            console.log("Energy depleted.");
-            // Клас 'no-energy' вже додається/видаляється в updateEnergyDisplay
-        }
-    });
-
-    // --- Upgrade buttons ---
-    upgrade1Button.addEventListener('click', () => {
-        if (score >= upgrade1Cost) {
-            score -= upgrade1Cost;
-            clickPower += 1;
-            upgrade1Cost = Math.floor(upgrade1Cost * 1.5);
-            updateDisplay();
-            savePlayerData();
-        }
-    });
-
-    upgrade2Button.addEventListener('click', () => {
-        if (score >= upgrade2Cost) {
-            score -= upgrade2Cost;
-            autoClickPower += 1;
-            upgrade2Cost = Math.floor(upgrade2Cost * 2);
-            startAutoClicker(); // Перезапускаємо автоклікер, щоб оновити швидкість
-            updateDisplay();
-            savePlayerData();
-        }
-    });
-
-    // --- Autosave ---
-    // Зберігаємо дані кожні 5 секунд для синхронізації з Firebase
-    setInterval(savePlayerData, 5000);
-});
-
-/*
-    Вам також потрібно додати ці стилі до вашого CSS файлу, якщо їх там ще немає:
-
-    .floating-text {
-        position: absolute;
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #0094FE; // Використано ваш корпоративний колір
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        opacity: 0;
-        animation: floatUp 1s forwards;
-        pointer-events: none; // Щоб не блокувати кліки
-        z-index: 100;
-        white-space: nowrap; // Щоб текст не переносився
-    }
-
-    @keyframes floatUp {
-        from {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-        to {
-            transform: translateY(-50px) scale(1.2);
-            opacity: 0;
-        }
-    }
-
-    .no-energy {
-        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        transform: translate3d(0, 0, 0);
-        backface-visibility: hidden;
-        perspective: 1000px;
-    }
-
-    @keyframes shake {
-        10%, 90% { transform: translate3d(-1px, 0, 0); }
-        20%, 80% { transform: translate3d(2px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-        40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
-*/
     
