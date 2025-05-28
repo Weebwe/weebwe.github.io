@@ -1,6 +1,6 @@
-// script.js - Оновлена версія з логікою відновлення енергії тільки з 0
+// script.js - Фінальна версія з коректним відновленням енергії та таймером
 
-// ... (Ваша Firebase Initialization START блок залишається без змін) ...
+// --- Firebase Initialization START ---
 const firebaseConfig = {
   apiKey: "AIzaSyAt5GlmmqhW6IeDd3oFB0yq2xQARd8YPNs",
   authDomain: "weegamebot-7c44b.firebaseapp.com",
@@ -44,7 +44,7 @@ const progressBarFill = document.getElementById('progressBarFill');
 const loadingText = document.getElementById('loadingText');
 
 const mainBalanceElement = document.getElementById('mainBalance');
-const energyBarFill = document.getElementById('energyBarFill'); // Виправлено: getElementById
+const energyBarFill = document.getElementById('energyBarFill');
 const energyText = document.getElementById('energyText');
 
 // --- Game Variables ---
@@ -56,11 +56,13 @@ let upgrade1Cost = 100;
 let upgrade2Cost = 500;
 let telegramUserId = null;
 
-let currentEnergy = 100;    // ПОЧАТКОВА ЕНЕРГІЯ = 100
-const maxEnergy = 100;      // МАКСИМАЛЬНА ЕНЕРГІЯ = 100
-// Ця змінна тепер буде зберігати час, коли енергія стала 0.
-let lastEnergyZeroTime = 0; 
+let currentEnergy = 100;
+const maxEnergy = 100;
+// lastEnergyZeroTime: час, коли енергія ВОСТАННЄ стала 0.
+// Якщо енергія повна, це значення має бути 0 або null.
+let lastEnergyZeroTime = 0;
 let autoClickInterval;
+let rechargeTimerInterval; // Змінна для інтервалу таймера
 
 const coinClickSound = new Audio('coin_click.mp3');
 coinClickSound.volume = 0.5;
@@ -72,18 +74,68 @@ function updateDisplay() {
     upgrade1CostElement.textContent = upgrade1Cost;
     upgrade2CostElement.textContent = upgrade2Cost;
     checkUpgradeAvailability();
-    updateEnergyDisplay();
+    updateEnergyDisplay(); // Ця функція тепер вирішує, що показувати
 }
 
 function updateEnergyDisplay() {
     const percentage = (currentEnergy / maxEnergy) * 100;
     energyBarFill.style.width = `${percentage}%`;
-    const icon = currentEnergy <= 0 ? '🪫' : '🔋';
-    energyText.textContent = `${icon} ${Math.floor(currentEnergy)} / ${maxEnergy}`;
+
     clickButton.disabled = currentEnergy <= 0;
     clickButton.style.opacity = currentEnergy <= 0 ? 0.7 : 1;
     clickButton.style.cursor = currentEnergy <= 0 ? 'not-allowed' : 'pointer';
+
+    if (currentEnergy === 0) {
+        // Якщо енергія 0, показуємо таймер
+        startRechargeTimerDisplay();
+    } else {
+        // Якщо енергія не 0, показуємо звичайний текст і зупиняємо таймер
+        if (rechargeTimerInterval) {
+            clearInterval(rechargeTimerInterval);
+            rechargeTimerInterval = null;
+        }
+        energyText.textContent = `🔋 ${Math.floor(currentEnergy)} / ${maxEnergy}`;
+    }
 }
+
+// НОВА ФУНКЦІЯ: оновлення відображення таймера відновлення
+function updateRechargeTimerDisplay() {
+    const now = Date.now();
+    const fullDayInMs = 24 * 60 * 60 * 1000;
+    const timePassedSinceZero = now - lastEnergyZeroTime;
+    const timeLeftMs = fullDayInMs - timePassedSinceZero;
+
+    if (timeLeftMs <= 0) {
+        // Якщо час минув, спробуємо відновити енергію
+        rechargeEnergyOncePerDay(); // Ця функція перевірить, чи можна відновити
+        if (currentEnergy === maxEnergy) {
+            // Якщо енергія відновилася, зупиняємо таймер
+            if (rechargeTimerInterval) {
+                clearInterval(rechargeTimerInterval);
+                rechargeTimerInterval = null;
+            }
+            energyText.textContent = `🔋 ${Math.floor(currentEnergy)} / ${maxEnergy}`;
+            return;
+        }
+    }
+
+    // Якщо енергія ще не відновилася, показуємо відлік
+    const displayHours = Math.floor(timeLeftMs / (1000 * 60 * 60));
+    const displayMinutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
+    const displaySeconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
+
+    energyText.textContent = `⏳ ${displayHours}г ${String(displayMinutes).padStart(2, '0')}хв ${String(displaySeconds).padStart(2, '0')}с`;
+}
+
+// Функція для запуску інтервалу відображення таймера
+function startRechargeTimerDisplay() {
+    if (!rechargeTimerInterval) {
+        // Запускаємо оновлення таймера кожну секунду
+        rechargeTimerInterval = setInterval(updateRechargeTimerDisplay, 1000);
+        updateRechargeTimerDisplay(); // Викликаємо одразу, щоб уникнути затримки
+    }
+}
+
 
 function checkUpgradeAvailability() {
     upgrade1Button.disabled = score < upgrade1Cost;
@@ -98,26 +150,15 @@ function rechargeEnergyOncePerDay() {
     // Енергія відновлюється, тільки якщо вона ДОСЯГЛА 0 І пройшло 24 години
     if (currentEnergy === 0 && (now - lastEnergyZeroTime >= fullDayInMs)) {
         currentEnergy = maxEnergy; // Повне відновлення
-        lastEnergyZeroTime = now; // Оновлюємо час, коли вона знову стала повною (або була відновлена)
-        updateEnergyDisplay();
+        // lastEnergyZeroTime залишається на значенні, коли енергія стала 0,
+        // це важливо, якщо в майбутньому знадобиться знати, коли вона була *відновлена*.
+        // Для вашої поточної логіки (24 год. після 0) її не потрібно оновлювати тут.
+        updateDisplay(); // Оновлюємо дисплей, який перемкнеться з таймера на повну енергію
         savePlayerData();
         console.log("Energy fully recharged after 24 hours of being 0.");
-        // Можливо, тут можна показати спливаюче повідомлення "Енергія відновлена!"
-    } else if (currentEnergy === 0) {
-        // Якщо енергія 0, але 24 години ще не минули, показуємо час, що залишився
-        const timeLeftMs = fullDayInMs - (now - lastEnergyZeroTime);
-        if (timeLeftMs > 0) {
-            const timeLeftHours = Math.floor(timeLeftMs / (1000 * 60 * 60));
-            const timeLeftMinutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
-            console.log(`Energy depleted. Recharges in: ${timeLeftHours}h ${timeLeftMinutes}m`);
-        } else {
-            // Це має бути досягнуто, якщо пройшло 24 години, але функція не спрацювала
-            console.log("Energy depleted and 24 hours passed, but not recharged yet.");
-        }
-    } else {
-        // Якщо енергія не 0, ми не робимо нічого з її відновленням.
-        console.log("Energy is not 0, no recharge countdown active.");
+        // Тут можна додати спливаюче повідомлення "Енергія відновлена!"
     }
+    // Всі інші випадки обробляються функцією updateRechargeTimerDisplay
 }
 
 // --- Firebase: Load & Save ---
@@ -142,22 +183,27 @@ async function loadPlayerData() {
             mainBalance = data.mainBalance || 0;
             clickPower = data.clickPower || 1;
             autoClickPower = data.autoClickPower || 0;
-            currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : maxEnergy;
             upgrade1Cost = data.upgrade1Cost || 100;
             upgrade2Cost = data.upgrade2Cost || 500;
+            currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : maxEnergy;
             
-            // НОВЕ: Завантажуємо lastEnergyZeroTime
-            // Якщо його немає, встановлюємо на поточний час, якщо енергія 0, інакше 0
-            lastEnergyZeroTime = data.lastEnergyZeroTime || (currentEnergy === 0 ? Date.now() : 0);
+            // Завантажуємо lastEnergyZeroTime. Важливо: якщо енергія НЕ 0,
+            // lastEnergyZeroTime має бути 0 або null, щоб таймер не відображався.
+            // Якщо енергія 0, а часу немає, встановлюємо зараз, щоб почати відлік.
+            lastEnergyZeroTime = data.lastEnergyZeroTime || 0; // Завантажуємо
+            if (currentEnergy === 0 && !lastEnergyZeroTime) {
+                lastEnergyZeroTime = Date.now(); // Якщо енергія 0, але час не був збережений
+            }
+
 
         } else {
             console.log("No player data found for", telegramUserId, ". Starting new game.");
             // Для нового гравця енергія повна, тому lastEnergyZeroTime = 0
-            lastEnergyZeroTime = 0; 
+            lastEnergyZeroTime = 0;
         }
-        updateDisplay();
+        updateDisplay(); // Оновлюємо дисплей, що запустить таймер, якщо потрібно
         startAutoClicker();
-        rechargeEnergyOncePerDay(); // Перевіряємо енергію при завантаженні
+        rechargeEnergyOncePerDay(); // Перевіряємо, чи можна вже відновити енергію
     } catch (e) {
         console.error("Error loading player data:", e);
         updateDisplay();
@@ -172,14 +218,14 @@ async function savePlayerData() {
         await db.collection("players").doc(telegramUserId).set({
             score, mainBalance, clickPower, autoClickPower,
             upgrade1Cost, upgrade2Cost, currentEnergy,
-            lastEnergyZeroTime // НОВЕ: Зберігаємо lastEnergyZeroTime
+            lastEnergyZeroTime // Зберігаємо lastEnergyZeroTime
         }, { merge: true });
     } catch (e) {
         console.error("Error saving player data:", e);
     }
 }
 
-// ... (Ваш Autoclicker та Loading Screen блоки залишаються без змін) ...
+// --- Autoclicker ---
 function startAutoClicker() {
     if (autoClickInterval) clearInterval(autoClickInterval);
     if (autoClickPower > 0) {
@@ -193,6 +239,7 @@ function startAutoClicker() {
     }
 }
 
+// --- Loading Screen ---
 function startLoadingProgress() {
     let progress = 0;
     const interval = setInterval(() => {
@@ -249,13 +296,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentEnergy > 0) {
             score += clickPower;
             currentEnergy--;
-            updateDisplay();
             
             // НОВЕ: Якщо енергія щойно стала 0, фіксуємо цей час
             if (currentEnergy === 0) {
                 lastEnergyZeroTime = Date.now();
                 console.log("Energy hit 0. Recording time:", lastEnergyZeroTime);
             }
+            updateDisplay(); // updateDisplay викличе updateEnergyDisplay, яка запустить таймер
             savePlayerData(); // Зберігаємо дані після кожного кліку
 
             try {
@@ -305,3 +352,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setInterval(savePlayerData, 5000);
 });
+          
