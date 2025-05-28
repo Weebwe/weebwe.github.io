@@ -20,29 +20,101 @@
         </div>
     </div>
 
-    <div id="game-screen" class="container hidden">
-        <p id="debugUserId" class="debug-info"></p>
+    <div class="main-content-wrapper">
+        <div id="game-screen" class="screen-content">
+            <p id="debugUserId" class="debug-info"></p>
 
-        <h1>Твої монети: <span id="score">0</span> 🪙</h1>
-        <p class="secondary-balance">Твій основний баланс: <span id="mainBalance">0</span> <img src="coin.png" alt="WEE Coin Icon" class="balance-icon"></p>
+            <h1>Твої монети: <span id="score">0</span> 🪙</h1>
+            <p class="secondary-balance">Твій основний баланс: <span id="mainBalance">0</span> <img src="coin.png" alt="WEE Coin Icon" class="balance-icon"></p>
 
-        <div class="energy-bar-container">
-            <div class="energy-bar-fill" id="energyBarFill"></div>
-            <span class="energy-text" id="energyText"></span>
+            <div class="energy-bar-container">
+                <div class="energy-bar-fill" id="energyBarFill"></div>
+                <span class="energy-text" id="energyText"></span>
+            </div>
+
+            <div id="clickButton" class="click-area">
+                <img src="coin.png" alt="Click Coin" class="coin-image">
+            </div>
+
+            <p class="instructions">Натискай на монету, щоб заробляти!</p>
+
+            <div class="boosts">
+                <h2>Покращення</h2>
+                <button id="upgrade1">Більше монет за клік (+1) - Коштує: <span id="upgrade1Cost">100</span> 🪙</button>
+                <button id="upgrade2">Авто-клікер (+1 монета/сек) - Коштує: <span id="upgrade2Cost">500</span> 🪙</button>
+            </div>
         </div>
 
-        <div id="clickButton" class="click-area">
-            <img src="coin.png" alt="Click Coin" class="coin-image">
+        <div id="wallet-screen" class="screen-content hidden">
+            <h2>Гаманець</h2>
+            <div class="wallet-info">
+                <p>Твої WEE: <strong id="weeBalance">0.00</strong> WEE</p>
+                <p>Твої монети: <strong id="walletCoinBalance">0</strong> 🪙</p>
+                <p>Курс обміну: 1 000 000 🪙 = 1 WEE</p>
+            </div>
+            <div class="wallet-actions">
+                <p>Введи кількість монет для обміну на WEE:</p>
+                <input type="number" id="exchangeAmount" placeholder="Кількість монет" min="1000000" step="1000000">
+                <button id="exchangeButton">Обміняти монети на WEE</button>
+                <p class="exchange-info" style="font-size:0.9em; opacity:0.8;">Мінімальна сума для обміну: 1 000 000 монет</p>
+            </div>
         </div>
 
-        <p class="instructions">Натискай на монету, щоб заробляти!</p>
+        <div id="leaderboard-screen" class="screen-content hidden">
+            <h2>Таблиця лідерів</h2>
+            <p class="leaderboard-reward-info">Щотижня 1000 WEE ділиться між топ-100 лідерів!</p>
+            <ul id="leaderboardList" class="leaderboard-list">
+                <li class="leaderboard-item">
+                    <span class="rank">1.</span>
+                    <span class="name">Гравець 1</span>
+                    <span class="score">1000000 🪙</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span class="rank">2.</span>
+                    <span class="name">Гравець 2</span>
+                    <span class="score">950000 🪙</span>
+                </li>
+            </ul>
+            <button id="refreshLeaderboard">Оновити лідерборд</button>
+        </div>
 
-        <div class="boosts">
-            <h2>Покращення</h2>
-            <button id="upgrade1">Більше монет за клік (+1) - Коштує: <span id="upgrade1Cost">100</span> 🪙</button>
-            <button id="upgrade2">Авто-клікер (+1 монета/сек) - Коштує: <span id="upgrade2Cost">500</span> 🪙</button>
+        <div id="tasks-screen" class="screen-content hidden">
+            <h2>Завдання</h2>
+            <ul id="tasksList" class="tasks-list">
+                <li class="task-item">
+                    <h3>Привітання</h3>
+                    <p>Підпишіться на наш Telegram-канал.</p>
+                    <span class="reward">Нагорода: 500 🪙</span>
+                    <button>Виконати</button>
+                </li>
+                <li class="task-item">
+                    <h3>Перша покупка</h3>
+                    <p>Купіть будь-яке покращення.</p>
+                    <span class="reward">Нагорода: 0.5 WEE</span>
+                    <button>Виконати</button>
+                </li>
+            </ul>
         </div>
     </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-screen="game">
+            <img src="icons/game_icon.png" alt="Гра">
+            <span>Гра</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="wallet">
+            <img src="icons/wallet_icon.png" alt="Гаманець">
+            <span>Гаманець</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="leaderboard">
+            <img src="icons/leaderboard_icon.png" alt="Лідерборд">
+            <span>Лідерборд</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="tasks">
+            <img src="icons/tasks_icon.png" alt="Завдання">
+            <span>Завдання</span>
+        </a>
+    </nav>
 
     <script src="script.js"></script>
 </body>
