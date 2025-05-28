@@ -28,6 +28,7 @@ body {
     align-items: center;
     background-color: #0094FE; /* Ваш корпоративний колір: Синій */
     color: #FFFFFF; /* Ваш корпоративний колір: Білий */
+    flex-direction: column; /* Дозволяє розмістити вміст зверху і меню знизу */
 }
 
 /* Прихований клас для перемикання екранів */
@@ -105,8 +106,18 @@ body {
     width: 100%;
 }
 
-/* Основні стилі ігрового екрану */
-.container {
+/* Основні стилі для контенту (ігровий екран та нові сторінки) */
+.main-content-wrapper {
+    flex-grow: 1; /* Дозволяє контенту займати доступний простір */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 70px; /* Місце для нижнього меню */
+    box-sizing: border-box;
+}
+
+.screen-content {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.2); /* Темний, напівпрозорий фон для контенту */
     padding: 20px;
@@ -114,7 +125,7 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     max-width: 400px;
     width: 100%;
-    height: 100%;
+    height: 100%; /* Займає весь доступний простір всередині main-content-wrapper */
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -123,7 +134,7 @@ body {
     margin: auto;
 }
 
-h1 {
+h1, h2 {
     font-size: clamp(1.5em, 5vw, 2.5em);
     margin-top: 0;
     margin-bottom: 10px;
@@ -238,8 +249,8 @@ h1 {
     flex-shrink: 0;
 }
 
-/* Секція покращень */
-.boosts {
+/* Секція покращень та загальні стилі для кнопок на всіх сторінках */
+.boosts, .wallet-section, .leaderboard-section, .tasks-section {
     margin-top: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     padding-top: 20px;
@@ -250,9 +261,10 @@ h1 {
     justify-content: center;
     align-items: center;
     padding-bottom: 0;
+    text-align: center;
 }
 
-.boosts h2 {
+.boosts h2, .wallet-section h2, .leaderboard-section h2, .tasks-section h2 {
     font-size: clamp(1.4em, 4vw, 1.8em);
     margin-top: 0;
     margin-bottom: 15px;
@@ -260,7 +272,7 @@ h1 {
     flex-shrink: 0;
 }
 
-.boosts button {
+button { /* Загальні стилі для всіх кнопок */
     display: block;
     width: 90%;
     max-width: 300px;
@@ -282,16 +294,16 @@ h1 {
     touch-action: manipulation !important;
 }
 
-.boosts button:last-child {
+button:last-child {
     margin-bottom: 0;
 }
 
-.boosts button:hover {
+button:hover {
     background-color: #E0E0E0; /* Трохи темніший білий при наведенні */
     transform: translateY(-2px);
 }
 
-.boosts button:disabled {
+button:disabled {
     background-color: #555;
     color: #BBB; /* Сірий текст на відключених кнопках */
     cursor: not-allowed;
@@ -299,15 +311,115 @@ h1 {
     box-shadow: none;
 }
 
+/* Стилі для гаманця */
+.wallet-info p, .wallet-actions {
+    margin-bottom: 15px;
+}
+
+.wallet-info strong {
+    color: #FFD700; /* Золотий для важливих значень */
+}
+
+/* Стилі для лідерборду */
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+    width: 90%;
+    max-width: 350px;
+    margin: 0 auto 20px auto;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 1.1em;
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-item .rank {
+    font-weight: bold;
+    width: 30px;
+    text-align: left;
+}
+
+.leaderboard-item .name {
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 10px;
+}
+
+.leaderboard-item .score {
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.leaderboard-reward-info {
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+/* Стилі для завдань */
+.tasks-list {
+    list-style: none;
+    padding: 0;
+    width: 90%;
+    max-width: 350px;
+    margin: 0 auto 20px auto;
+}
+
+.task-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.task-item h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.2em;
+    color: #FFFFFF;
+}
+
+.task-item p {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.task-item .reward {
+    font-weight: bold;
+    color: #FFD700;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.task-item button {
+    margin-top: 10px;
+    width: 100%;
+}
+
+
 /* Медіа-запити для адаптивності */
 @media (max-height: 650px), (max-width: 400px) {
-    .container {
+    .screen-content {
         padding: 15px;
+        height: calc(100% - 70px); /* Враховуємо висоту меню */
     }
-    .boosts h2 {
+    h1, h2 {
         margin-bottom: 10px;
     }
-    .boosts button {
+    button {
         padding: 10px;
         margin-bottom: 8px;
         font-size: clamp(0.8em, 2.5vw, 1em);
@@ -348,4 +460,59 @@ h1 {
         opacity: 0; /* Повністю зникає */
         transform: translateY(-50px) translateX(-50%); /* Рухається вгору */
     }
-    }
+}
+
+/* Нижнє меню навігації */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Фіксована висота меню */
+    background-color: rgba(0, 0, 0, 0.4); /* Напівпрозорий чорний фон */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 999; /* Поверх іншого контенту, але під завантажувальним екраном */
+    box-sizing: border-box;
+    padding: 0 10px; /* Невеликий відступ з боків */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 0.8em;
+    text-decoration: none;
+    flex: 1; /* Рівномірно розподіляє простір */
+    padding: 5px;
+    transition: background-color 0.2s ease;
+    border-radius: 8px;
+    height: 100%; /* Займає всю висоту меню */
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+    color: #FFD700; /* Активний елемент золотого кольору */
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-item img {
+    width: 24px; /* Розмір іконки */
+    height: 24px;
+    margin-bottom: 3px;
+    filter: brightness(0) invert(1); /* Білі іконки за замовчуванням */
+}
+
+.nav-item.active img {
+    filter: none; /* Залишаємо оригінальний колір іконки (або задаємо золотий, якщо іконки будуть кольорові) */
+    /* Або, якщо іконки мають бути золотими: */
+    /* filter: sepia(100%) saturate(200%) hue-rotate(15deg) brightness(1.2) contrast(1.2); */
+}
