@@ -327,6 +327,9 @@ button:disabled {
     width: 90%;
     max-width: 350px;
     margin: 0 auto 20px auto;
+    overflow-y: auto; /* Дозволяє прокрутку, якщо список великий */
+    max-height: 60vh; /* Обмежує висоту списку лідерів */
+    box-sizing: border-box;
 }
 
 .leaderboard-item {
@@ -371,6 +374,9 @@ button:disabled {
     width: 90%;
     max-width: 350px;
     margin: 0 auto 20px auto;
+    overflow-y: auto; /* Дозволяє прокрутку, якщо список великий */
+    max-height: 60vh; /* Обмежує висоту списку завдань */
+    box-sizing: border-box;
 }
 
 .task-item {
@@ -414,7 +420,7 @@ button:disabled {
 @media (max-height: 650px), (max-width: 400px) {
     .screen-content {
         padding: 15px;
-        height: calc(100% - 70px); /* Враховуємо висоту меню */
+        height: calc(100% - 60px); /* Враховуємо висоту меню */
     }
     h1, h2 {
         margin-bottom: 10px;
@@ -430,6 +436,15 @@ button:disabled {
     }
     .loading-logo {
         width: clamp(80px, 30vw, 150px);
+    }
+    .bottom-nav {
+        height: 50px; /* Менша висота меню на маленьких екранах */
+    }
+    .nav-item span {
+        font-size: 0.7em;
+    }
+    .nav-item .nav-icon {
+        font-size: 1.5em; /* Менший розмір емодзі */
     }
 }
 
@@ -504,15 +519,8 @@ button:disabled {
     background-color: rgba(255, 255, 255, 0.15);
 }
 
-.nav-item img {
-    width: 24px; /* Розмір іконки */
-    height: 24px;
+.nav-item .nav-icon {
+    font-size: 2em; /* Розмір емодзі */
+    line-height: 1; /* Прибираємо зайвий простір навколо емодзі */
     margin-bottom: 3px;
-    filter: brightness(0) invert(1); /* Білі іконки за замовчуванням */
-}
-
-.nav-item.active img {
-    filter: none; /* Залишаємо оригінальний колір іконки (або задаємо золотий, якщо іконки будуть кольорові) */
-    /* Або, якщо іконки мають бути золотими: */
-    /* filter: sepia(100%) saturate(200%) hue-rotate(15deg) brightness(1.2) contrast(1.2); */
 }
