@@ -92,19 +92,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Game Logic ---
     function updateUI() {
-        scoreDisplay.textContent = currentScore;
+        scoreDisplay.textContent = currentScore.toLocaleString(); // Format with commas
         energyText.textContent = `${currentEnergy}/${MAX_ENERGY}`;
         energyBarFill.style.width = `${(currentEnergy / MAX_ENERGY) * 100}%`;
 
-        upgrade1CostDisplay.textContent = upgrade1Cost;
-        upgrade2CostDisplay.textContent = upgrade2Cost;
+        upgrade1CostDisplay.textContent = upgrade1Cost.toLocaleString();
+        upgrade2CostDisplay.textContent = upgrade2Cost.toLocaleString();
 
         upgrade1Button.disabled = currentScore < upgrade1Cost;
         upgrade2Button.disabled = currentScore < upgrade2Cost;
 
         // Update balances on Wallet screen
         weeBalanceDisplay.textContent = weeBalance.toFixed(2);
-        walletCoinBalanceDisplay.textContent = currentScore; // Coins are the same as game score
+        walletCoinBalanceDisplay.textContent = currentScore.toLocaleString(); // Coins are the same as game score
         mainBalanceDisplay.textContent = weeBalance.toFixed(2); // Assuming mainBalance displays WEE
     }
 
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const amountToExchange = parseInt(exchangeAmountInput.value);
 
         if (isNaN(amountToExchange) || amountToExchange < WEE_EXCHANGE_RATE) {
-            alert(`Будь ласка, введіть суму, більшу або рівну ${WEE_EXCHANGE_RATE} монет.`);
+            alert(`Будь ласка, введіть суму, більшу або рівну ${WEE_EXCHANGE_RATE.toLocaleString()} монет.`);
             return;
         }
 
@@ -195,6 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // TODO: Надсилати запит на бекенд для обміну монет на WEE.
+            // Це критично для безпеки та збереження даних.
             // Приклад (псевдокод):
             // fetch('/api/exchange', {
             //     method: 'POST',
@@ -205,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // .then(data => {
             //     if (data.success) {
             //         weeBalance = data.newWeeBalance; // Оновлюємо баланс з бекенду
-            //         alert(`Успішно обміняно ${amountToExchange} монет на ${weeEarned.toFixed(2)} WEE!`);
+            //         alert(`Успішно обміняно ${amountToExchange.toLocaleString()} монет на ${weeEarned.toFixed(2)} WEE!`);
             //     } else {
             //         alert('Помилка обміну: ' + data.message);
             //         currentScore += amountToExchange; // Повертаємо монети, якщо обмін не вдався
@@ -218,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // });
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            alert(`Успішно обміняно ${amountToExchange} монет на ${weeEarned.toFixed(2)} WEE!`);
+            alert(`Успішно обміняно ${amountToExchange.toLocaleString()} монет на ${weeEarned.toFixed(2)} WEE!`);
             exchangeAmountInput.value = ''; // Clear input
             updateUI();
         } else {
@@ -232,8 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function fetchLeaderboardData() {
+        leaderboardList.innerHTML = '<li style="text-align:center;">Завантаження лідерборду...</li>';
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // TODO: Надсилати запит на бекенд для отримання даних лідерборду.
+        // Це необхідно для реального відображення лідерів та їх оновлення.
         // Приклад (псевдокод):
         // try {
         //     const response = await fetch('/api/leaderboard');
@@ -250,13 +253,29 @@ document.addEventListener('DOMContentLoaded', () => {
         // }
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        // Mock data for demonstration without backend
+        // Mock data for demonstration without backend (remove this in production)
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
         const mockLeaders = [
             { rank: 1, name: "Гравець A", score: 5000000 },
             { rank: 2, name: "Гравець B", score: 4500000 },
             { rank: 3, name: "Гравець C", score: 4000000 },
             { rank: 4, name: "Гравець D", score: 3500000 },
             { rank: 5, name: "Гравець E", score: 3000000 },
+            { rank: 6, name: "Гравець F", score: 2500000 },
+            { rank: 7, name: "Гравець G", score: 2000000 },
+            { rank: 8, name: "Гравець H", score: 1500000 },
+            { rank: 9, name: "Гравець I", score: 1000000 },
+            { rank: 10, name: "Гравець J", score: 500000 },
+            { rank: 11, name: "Гравець K", score: 400000 },
+            { rank: 12, name: "Гравець L", score: 300000 },
+            { rank: 13, name: "Гравець M", score: 200000 },
+            { rank: 14, name: "Гравець N", score: 100000 },
+            { rank: 15, name: "Гравець O", score: 50000 },
+            { rank: 16, name: "Гравець P", score: 20000 },
+            { rank: 17, name: "Гравець Q", score: 10000 },
+            { rank: 18, name: "Гравець R", score: 5000 },
+            { rank: 19, name: "Гравець S", score: 2000 },
+            { rank: 20, name: "Гравець T", score: 1000 },
         ];
         displayLeaderboard(mockLeaders);
     }
@@ -281,11 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Tasks Screen Logic ---
     async function fetchTasksData() {
+        tasksList.innerHTML = '<li style="text-align:center;">Завантаження завдань...</li>';
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // TODO: Надсилати запит на бекенд для отримання списку завдань та їхнього статусу.
+        // TODO: Надсилати запит на бекенд для отримання списку завдань та їхнього статусу для поточного користувача.
+        // Це необхідно для відстеження прогресу та видачі нагород.
         // Приклад (псевдокод):
         // try {
-        //     const response = await fetch('/api/tasks');
+        //     const response = await fetch('/api/tasks?userId=' + Telegram.WebApp.initDataUnsafe?.user?.id);
         //     const data = await response.json();
         //     if (data.success) {
         //         displayTasks(data.tasks);
@@ -299,12 +320,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // }
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        // Mock data for demonstration without backend
+        // Mock data for demonstration without backend (remove this in production)
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
         const mockTasks = [
             { id: 1, name: "Привітання", description: "Підпишіться на наш Telegram-канал.", reward: "500 🪙", type: "coins", completed: false },
             { id: 2, name: "Перша покупка", description: "Купіть будь-яке покращення.", reward: "0.5 WEE", type: "wee", completed: false },
             { id: 3, name: "Запроси друга", description: "Запросіть одного друга в гру.", reward: "1.0 WEE", type: "wee", completed: true }, // Example of completed task
             { id: 4, name: "Натисни 1000 разів", description: "Клікніть монету 1000 разів.", reward: "1000 🪙", type: "coins", completed: false },
+            { id: 5, name: "Досягни 10000 монет", description: "Назбирайте 10000 монет.", reward: "0.1 WEE", type: "wee", completed: false },
         ];
         displayTasks(mockTasks);
     }
@@ -322,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>${task.name}</h3>
                 <p>${task.description}</p>
                 <span class="reward">Нагорода: ${task.reward}</span>
-                <button data-task-id="${task.id}" ${task.completed ? 'disabled' : ''}>
+                <button data-task-id="${task.id}" data-task-type="${task.type}" data-task-reward="${task.reward}" ${task.completed ? 'disabled' : ''}>
                     ${task.completed ? 'Виконано' : 'Виконати'}
                 </button>
             `;
@@ -330,54 +353,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const taskButton = li.querySelector('button');
             if (!task.completed) {
-                taskButton.addEventListener('click', () => completeTask(task.id, task.type, task.reward));
+                taskButton.addEventListener('click', (e) => {
+                    // Prevent multiple clicks before backend response
+                    e.target.disabled = true;
+                    completeTask(task.id, task.type, task.reward)
+                        .finally(() => {
+                            // Re-enable button if needed, or rely on fetchTasksData to update
+                            // e.target.disabled = false;
+                        });
+                });
             }
         });
     }
 
-    function completeTask(taskId, taskType, reward) {
+    async function completeTask(taskId, taskType, reward) {
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // TODO: Надсилати запит на бекенд для позначення завдання як виконаного та видачі нагороди.
+        // Це критично для безпеки та коректної видачі нагород.
         // Приклад (псевдокод):
-        // fetch('/api/completeTask', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ userId: Telegram.WebApp.initDataUnsafe?.user?.id, taskId: taskId })
-        // })
-        // .then(response => response.json())
-        // .then(data => {
+        // try {
+        //     const response = await fetch('/api/completeTask', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ userId: Telegram.WebApp.initDataUnsafe?.user?.id, taskId: taskId })
+        //     });
+        //     const data = await response.json();
         //     if (data.success) {
         //         alert(`Завдання "${taskId}" виконано! Отримано: ${reward}`);
         //         if (taskType === 'coins') {
-        //             currentScore += parseInt(reward.replace(' 🪙', ''));
+        //             currentScore = data.newCoinsBalance; // Оновлюємо з бекенду
         //         } else if (taskType === 'wee') {
-        //             weeBalance += parseFloat(reward.replace(' WEE', ''));
+        //             weeBalance = data.newWeeBalance; // Оновлюємо з бекенду
         //         }
         //         updateUI();
-        //         fetchTasksData(); // Refresh tasks list
+        //         fetchTasksData(); // Refresh tasks list to reflect completion
         //     } else {
         //         alert('Помилка виконання завдання: ' + data.message);
         //     }
-        // })
-        // .catch(error => {
+        // } catch (error) {
         //     console.error('Помилка запиту:', error);
         //     alert('Помилка зв\'язку з сервером. Спробуйте пізніше.');
-        // });
+        // }
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        // Mock completion for demonstration
+        // Mock completion for demonstration (remove this in production)
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
         alert(`Завдання "${taskId}" виконано! (Це імітація)`);
-        // In a real app, after successful backend response:
-        // currentScore or weeBalance would be updated and tasks refetched/updated
-        // For now, just show it as completed and update UI
         if (taskType === 'coins') {
             currentScore += parseInt(reward.replace(' 🪙', ''));
         } else if (taskType === 'wee') {
             weeBalance += parseFloat(reward.replace(' WEE', ''));
         }
         updateUI();
-        // Re-fetch tasks to update UI for completed task (button disabled)
-        fetchTasksData();
+        fetchTasksData(); // Re-fetch tasks to update UI for completed task (button disabled)
     }
 
 
@@ -396,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show target screen
             if (targetScreen === 'game') {
                 gameScreen.classList.remove('hidden');
+                updateUI(); // Оновлюємо UI, щоб відобразити поточний рахунок/енергію
             } else if (targetScreen === 'wallet') {
                 walletScreen.classList.remove('hidden');
                 updateUI(); // Ensure wallet balance is up-to-date
