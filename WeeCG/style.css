@@ -1,343 +1,361 @@
-/* style.css - Фінальна версія з усіма корективами та стилями для таймера */
-
-/* Загальні правила для HTML та Body */
-html, body {
-    width: 100%;
-    height: 100%;
+/* Основні стилі для body */
+body {
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Запобігаємо прокрутці */
-    font-family: 'Arial', sans-serif;
-    box-sizing: border-box; /* Включаємо padding та border у розмір елемента */
-}
-
-/* Загальні правила для скидання системних виділень та ефектів торкання */
-* {
-    -webkit-tap-highlight-color: transparent !important; /* Для Android - прибирає кольорове підсвічування при торканні */
-    -webkit-touch-callout: none !important; /* Для iOS - запобігає появі контекстного меню */
-    -webkit-user-select: none !important; /* Запобігає виділенню тексту при довгому тапі */
-    -moz-user-select: none !important; /* Для Firefox */
-    -ms-user-select: none !important; /* Для Internet Explorer/Edge */
-    user-select: none !important; /* Стандартна властивість */
-}
-
-/* Колірна схема: Синій фон, Білий текст (за запитом користувача) */
-body {
+    background-color: #f0f2f5;
+    color: #333;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #0094FE; /* Ваш корпоративний колір: Синій */
-    color: #FFFFFF; /* Ваш корпоративний колір: Білий */
-    flex-direction: column; /* Дозволяє розмістити вміст зверху і меню знизу */
+    flex-direction: column;
+    height: 100vh; /* Використовуємо 100% висоти вьюпорта */
+    overflow: hidden; /* Запобігаємо прокрутці body */
 }
 
-/* Прихований клас для перемикання екранів */
+/* Прихований клас */
 .hidden {
     display: none !important;
 }
 
-/* Екран завантаження */
-.loading-screen {
+/* Стилі для екрану завантаження */
+#loading-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #0094FE; /* Корпоративний синій */
+    background-color: #0094FE; /* Ваш корпоративний колір */
+    color: #fff;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    font-size: 1.2em;
     z-index: 1000;
-    color: #FFFFFF;
-    text-align: center;
-    padding: 20px;
-    box-sizing: border-box;
 }
 
-.loading-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.progress-bar {
     width: 80%;
-    max-width: 300px;
-}
-
-.loading-logo {
-    width: clamp(100px, 40vw, 200px);
-    height: auto;
-    margin-bottom: 30px;
-    animation: pulse 1.5s infinite alternate;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1.05); opacity: 0.9; }
-}
-
-.progress-bar-container {
-    width: 100%;
     height: 15px;
-    background-color: rgba(255, 255, 255, 0.3); /* Напівпрозорий білий */
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 .progress-bar-fill {
     height: 100%;
     width: 0%;
-    background-color: #FFFFFF; /* Корпоративний білий */
+    background-color: #fff;
     border-radius: 10px;
-    transition: width 0.4s ease-out;
+    transition: width 0.1s linear;
 }
 
-.loading-text {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-.copyright {
-    font-size: 0.8em;
-    opacity: 0.7;
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-}
-
-/* Основні стилі для контенту (ігровий екран та нові сторінки) */
-.main-content-wrapper {
-    flex-grow: 1; /* Дозволяє контенту займати доступний простір */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 70px; /* Місце для нижнього меню */
-    box-sizing: border-box;
-}
-
-.screen-content {
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.2); /* Темний, напівпрозорий фон для контенту */
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    width: 100%;
-    height: 100%; /* Займає весь доступний простір всередині main-content-wrapper */
+/* Стилі для основного контенту гри */
+#main-content-wrapper {
+    flex-grow: 1; /* Дозволяє контенту займати доступне місце */
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
+    overflow-y: auto; /* Дозволяємо прокрутку для вмісту екранів */
+    padding-bottom: 70px; /* Залиште місце для нижньої навігації */
+}
+
+.screen {
+    width: 100%;
+    min-height: 100%; /* Кожен екран займає всю висоту */
     box-sizing: border-box;
-    margin: auto;
-}
-
-h1, h2 {
-    font-size: clamp(1.5em, 5vw, 2.5em);
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: #FFFFFF;
-    flex-shrink: 0;
-}
-
-#score {
-    font-weight: bold;
-}
-
-.secondary-balance {
-    font-size: clamp(1em, 3vw, 1.4em);
-    margin-top: 0;
-    margin-bottom: 15px;
+    padding: 20px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 5px;
+    justify-content: flex-start;
+    padding-top: 50px; /* Відступ зверху */
+    background-color: #f0f2f5; /* Світлий фон */
 }
 
-.balance-icon {
-    width: 50px;
-    height: 50px;
-}
-
-/* Стилі для енергії */
-.energy-bar-container {
-    width: 90%;
-    max-width: 300px;
-    height: 20px;
-    background-color: rgba(255, 255, 255, 0.2); /* Напівпрозорий білий фон */
-    border-radius: 10px;
-    overflow: hidden;
+.header {
+    width: 100%;
+    text-align: center;
     margin-bottom: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #555;
+}
+
+.balance {
+    font-size: 1.5em;
+    color: #0094FE; /* Ваш корпоративний колір */
+}
+
+.score-area {
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.energy-bar-container {
+    width: 80%;
+    background-color: #e0e0e0;
+    border-radius: 15px;
+    height: 25px;
+    margin-bottom: 30px;
+    overflow: hidden;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
 }
 
 .energy-bar-fill {
     height: 100%;
-    width: 100%;
-    background-color: #FFD700; /* Золотий колір для енергії */
-    border-radius: 10px;
-    position: absolute;
-    top: 0;
-    left: 0;
+    background: linear-gradient(to right, #4CAF50, #8BC34A);
+    border-radius: 15px;
     transition: width 0.2s ease-out;
 }
 
 .energy-text {
-    position: relative;
-    z-index: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
     font-weight: bold;
-    color: #000; /* Чорний текст для кращого контрасту з золотим фоном */
-    font-size: 0.9em;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
-    white-space: nowrap; /* Додано, щоб таймер не переносився на новий рядок */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    z-index: 1;
 }
 
-/* Кнопка кліку (монета) */
-.click-area {
-    width: clamp(200px, 70vw, 300px);
-    height: clamp(200px, 70vw, 300px);
+.main-click-button {
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: #0094FE; /* Ваш корпоративний колір */
+    color: white;
+    font-size: 2.5em;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
     cursor: pointer;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    transition: transform 0.1s ease-out;
-    border: 5px solid rgba(255, 255, 255, 0.5); /* Біла напівпрозора рамка */
-    overflow: hidden;
-    background-color: transparent; /* Зробимо прозорим, щоб бачити тільки img */
-    flex-shrink: 0; /* Щоб не стискався на маленьких екранах */
-
-    /* Видаляємо синій фокусний обвід */
-    outline: none !important;
-    box-shadow: none !important; /* У разі, якщо браузер імітує обвід тінью */
-    touch-action: manipulation !important; /* Для кращої обробки торкання */
+    transition: transform 0.1s ease-out, background-color 0.2s;
+    margin-bottom: 40px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent; /* Прибирає синій фон при кліку на мобільних */
 }
 
-.click-area:active {
+.main-click-button:active {
     transform: scale(0.95);
-    outline: none !important; /* Прибирає фокусний обвід при активному стані */
-    box-shadow: none !important; /* Прибирає тінь, яка може імітувати обвід */
-    background-color: transparent !important; /* Переконайтесь, що фон прозорий при натисканні */
-    touch-action: manipulation !important;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.5);
 }
 
-.click-area:focus {
-    outline: none !important; /* Прибирає фокусний обвід */
-    box-shadow: none !important; /* Прибирає тінь, яка може імітувати обвід */
-    background-color: transparent !important; /* Переконайтесь, що фон прозорий при фокусі */
-    touch-action: manipulation !important;
+.main-click-button:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
-.coin-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-}
-
-.instructions {
-    font-size: clamp(0.9em, 2.5vw, 1.1em);
-    margin-top: 0;
-    margin-bottom: 0;
-    opacity: 0.8;
-    flex-shrink: 0;
-}
-
-/* Секція покращень та загальні стилі для кнопок на всіх сторінках */
-.boosts, .wallet-section, .leaderboard-section, .tasks-section {
-    margin-top: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    padding-top: 20px;
-    width: 100%;
-    flex-grow: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 0;
+.upgrades-container {
+    width: 90%;
+    max-width: 500px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     text-align: center;
 }
 
-.boosts h2, .wallet-section h2, .leaderboard-section h2, .tasks-section h2 {
-    font-size: clamp(1.4em, 4vw, 1.8em);
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #FFFFFF;
-    flex-shrink: 0;
+.upgrades-container h2 {
+    color: #0094FE;
+    margin-bottom: 20px;
 }
 
-button { /* Загальні стилі для всіх кнопок */
-    display: block;
-    width: 90%;
-    max-width: 300px;
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: #FFFFFF; /* Білий колір кнопок апгрейдів */
-    color: #0094FE; /* Синій текст на кнопках апгрейдів */
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.upgrade-item:last-child {
+    border-bottom: none;
+}
+
+.upgrade-item button {
+    background-color: #0094FE; /* Ваш корпоративний колір */
+    color: white;
     border: none;
+    padding: 8px 15px;
     border-radius: 8px;
-    font-size: clamp(0.9em, 3vw, 1.1em);
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    flex-shrink: 0;
-
-    /* Видаляємо синій фокусний обвід для кнопок */
-    outline: none !important;
-    box-shadow: none !important;
-    touch-action: manipulation !important;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
 }
 
-button:last-child {
-    margin-bottom: 0;
+.upgrade-item button:hover {
+    background-color: #007bb5;
 }
 
-button:hover {
-    background-color: #E0E0E0; /* Трохи темніший білий при наведенні */
-    transform: translateY(-2px);
-}
-
-button:disabled {
-    background-color: #555;
-    color: #BBB; /* Сірий текст на відключених кнопках */
+.upgrade-item button:disabled {
+    background-color: #a0a0a0;
     cursor: not-allowed;
-    opacity: 0.6;
-    box-shadow: none;
 }
 
-/* Стилі для гаманця */
-.wallet-info p, .wallet-actions {
+.upgrade-item span {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Floating text for clicks */
+.floating-text {
+    position: absolute;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #0094FE; /* Ваш корпоративний колір */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    opacity: 0;
+    animation: floatUp 1s forwards;
+    pointer-events: none;
+    z-index: 100;
+    white-space: nowrap;
+}
+
+@keyframes floatUp {
+    from {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-50px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Shake animation for no energy */
+.no-energy {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 500;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    cursor: pointer;
+    color: #888;
+    font-size: 0.8em;
+    transition: color 0.2s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-item .icon {
+    font-size: 1.8em;
+    margin-bottom: 3px;
+}
+
+.nav-item.active {
+    color: #0094FE; /* Активний елемент - ваш корпоративний колір */
+}
+
+/* --- Wallet Screen Specific Styles --- */
+.wallet-screen h2, .leaderboard-screen h2, .tasks-screen h2 {
+    color: #0094FE;
+    margin-bottom: 20px;
+}
+
+.balance-info p {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.balance-info span {
+    font-weight: bold;
+    color: #333;
+}
+
+.exchange-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.exchange-section h3 {
+    color: #555;
     margin-bottom: 15px;
 }
 
-.wallet-info strong {
-    color: #FFD700; /* Золотий для важливих значень */
+.exchange-section input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
 }
 
-/* Стилі для лідерборду */
+.exchange-section button {
+    background-color: #0094FE;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.2s;
+}
+
+.exchange-section button:hover {
+    background-color: #007bb5;
+}
+
+/* --- Leaderboard Screen Specific Styles --- */
 .leaderboard-list {
     list-style: none;
     padding: 0;
     width: 90%;
-    max-width: 350px;
-    margin: 0 auto 20px auto;
-    overflow-y: auto; /* Дозволяє прокрутку, якщо список великий */
-    max-height: 60vh; /* Обмежує висоту списку лідерів */
-    box-sizing: border-box;
+    max-width: 500px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
 }
 
 .leaderboard-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
     font-size: 1.1em;
+    align-items: center;
 }
 
 .leaderboard-item:last-child {
@@ -346,6 +364,7 @@ button:disabled {
 
 .leaderboard-item .rank {
     font-weight: bold;
+    color: #0094FE;
     width: 30px;
     text-align: left;
 }
@@ -354,173 +373,93 @@ button:disabled {
     flex-grow: 1;
     text-align: left;
     margin-left: 10px;
+    color: #333;
 }
 
 .leaderboard-item .score {
     font-weight: bold;
-    color: #FFD700;
+    color: #555;
 }
 
-.leaderboard-reward-info {
-    font-size: 0.9em;
-    opacity: 0.8;
-    margin-bottom: 20px;
+.leaderboard-item.current-player {
+    background-color: #e6f7ff; /* Світло-блакитний фон для поточного гравця */
+    border-left: 5px solid #0094FE;
+    font-weight: bold;
 }
 
-/* Стилі для завдань */
+#refreshLeaderboard {
+    background-color: #4CAF50; /* Зелений колір */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+#refreshLeaderboard:hover {
+    background-color: #45a049;
+}
+
+/* --- Tasks Screen Specific Styles --- */
 .tasks-list {
     list-style: none;
     padding: 0;
     width: 90%;
-    max-width: 350px;
-    margin: 0 auto 20px auto;
-    overflow-y: auto; /* Дозволяє прокрутку, якщо список великий */
-    max-height: 60vh; /* Обмежує висоту списку завдань */
-    box-sizing: border-box;
+    max-width: 500px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
 }
 
 .task-item {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
     padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.task-item:last-child {
+    border-bottom: none;
 }
 
 .task-item h3 {
     margin-top: 0;
     margin-bottom: 5px;
-    font-size: 1.2em;
-    color: #FFFFFF;
+    color: #0094FE;
 }
 
 .task-item p {
     font-size: 0.9em;
+    color: #666;
     margin-bottom: 10px;
-    opacity: 0.9;
 }
 
 .task-item .reward {
     font-weight: bold;
-    color: #FFD700;
-    margin-bottom: 10px;
+    color: #555;
     display: block;
+    margin-bottom: 10px;
 }
 
 .task-item button {
-    margin-top: 10px;
-    width: 100%;
-}
-
-
-/* Медіа-запити для адаптивності */
-@media (max-height: 650px), (max-width: 400px) {
-    .screen-content {
-        padding: 15px;
-        height: calc(100% - 60px); /* Враховуємо висоту меню */
-    }
-    h1, h2 {
-        margin-bottom: 10px;
-    }
-    button {
-        padding: 10px;
-        margin-bottom: 8px;
-        font-size: clamp(0.8em, 2.5vw, 1em);
-    }
-    .click-area {
-        width: clamp(150px, 60vw, 250px);
-        height: clamp(150px, 60vw, 250px);
-    }
-    .loading-logo {
-        width: clamp(80px, 30vw, 150px);
-    }
-    .bottom-nav {
-        height: 50px; /* Менша висота меню на маленьких екранах */
-    }
-    .nav-item span {
-        font-size: 0.7em;
-    }
-    .nav-item .nav-icon {
-        font-size: 1.5em; /* Менший розмір емодзі */
-    }
-}
-
-/* Стилі для плаваючого тексту */
-.floating-text {
-    position: fixed; /* Використовуємо fixed для позиціонування відносно вікна */
-    font-size: clamp(1.2em, 5vw, 2em);
-    font-weight: bold;
-    color: #FFD700; /* Золотий колір для монет */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-    opacity: 0; /* Починаємо з невидимого */
-    pointer-events: none; /* Не дозволяємо клікати по ньому */
-    z-index: 10; /* Щоб був поверх інших елементів */
-    transform: translateY(0) translateX(-50%); /* Початкове положення для анімації та центрування */
-    animation: fadeAndMoveUp 0.8s ease-out forwards; /* Анімація */
-    white-space: nowrap; /* Запобігає переносу тексту */
-}
-
-@keyframes fadeAndMoveUp {
-    0% {
-        opacity: 0;
-        transform: translateY(0px) translateX(-50%);
-    }
-    15% {
-        opacity: 1; /* З'являється швидко */
-    }
-    100% {
-        opacity: 0; /* Повністю зникає */
-        transform: translateY(-50px) translateX(-50%); /* Рухається вгору */
-    }
-}
-
-/* Нижнє меню навігації */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 60px; /* Фіксована висота меню */
-    background-color: rgba(0, 0, 0, 0.4); /* Напівпрозорий чорний фон */
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 999; /* Поверх іншого контенту, але під завантажувальним екраном */
-    box-sizing: border-box;
-    padding: 0 10px; /* Невеликий відступ з боків */
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #FFFFFF;
-    font-size: 0.8em;
-    text-decoration: none;
-    flex: 1; /* Рівномірно розподіляє простір */
-    padding: 5px;
-    transition: background-color 0.2s ease;
+    background-color: #2196F3; /* Блакитний колір */
+    color: white;
+    border: none;
+    padding: 8px 15px;
     border-radius: 8px;
-    height: 100%; /* Займає всю висоту меню */
     cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
 }
 
-.nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.task-item button:hover:not(:disabled) {
+    background-color: #0b7dda;
 }
 
-.nav-item.active {
-    color: #FFD700; /* Активний елемент золотого кольору */
-    background-color: rgba(255, 255, 255, 0.15);
+.task-item button:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
 }
 
-.nav-item .nav-icon {
-    font-size: 2em; /* Розмір емодзі */
-    line-height: 1; /* Прибираємо зайвий простір навколо емодзі */
-    margin-bottom: 3px;
-}
