@@ -3,104 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEE Coin Clicker</title>
+    <title>WeeGame Bot</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    </head>
+</head>
 <body>
 
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <img src="logo.jpg" alt="Company Logo" class="loading-logo">
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="progressBarFill"></div>
-            </div>
-            <p class="loading-text" id="loadingText">Завантаження...</p>
-            <p class="copyright">© 2025 WEE Coin. Всі права захищені.</p>
+    <div id="loading-screen" class="screen">
+        <div class="progress-bar">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
         </div>
+        <p id="loadingText">Завантаження... 0%</p>
+        <p id="debugUserId" style="font-size: 0.8em; color: gray; margin-top: 10px;">ID: Завантаження...</p>
     </div>
 
-    <div class="main-content-wrapper">
-        <div id="game-screen" class="screen-content">
-            <p id="debugUserId" class="debug-info"></p>
-
-            <h1>Твої монети: <span id="score">0</span> 🪙</h1>
-            <p class="secondary-balance">Твій основний баланс: <span id="mainBalance">0</span> <img src="coin.png" alt="WEE Coin Icon" class="balance-icon"></p>
-
+    <div id="main-content-wrapper">
+        <div id="game-screen" class="screen hidden main-screen">
+            <div class="header">
+                <span class="balance">WEE: <span id="mainBalance">0.00</span></span>
+            </div>
+            <div class="score-area">
+                <span id="score">0</span> 🪙
+            </div>
             <div class="energy-bar-container">
-                <div class="energy-bar-fill" id="energyBarFill"></div>
-                <span class="energy-text" id="energyText"></span>
+                <div id="energyBarFill" class="energy-bar-fill"></div>
+                <div id="energyText" class="energy-text">🔋 100 / 100</div>
             </div>
+            <button id="clickButton" class="main-click-button">Клік!</button>
 
-            <div id="clickButton" class="click-area">
-                <img src="coin.png" alt="Click Coin" class="coin-image">
-            </div>
-
-            <p class="instructions">Натискай на монету, щоб заробляти!</p>
-
-            <div class="boosts">
+            <div class="upgrades-container">
                 <h2>Покращення</h2>
-                <button id="upgrade1">Більше монет за клік (+1) - Коштує: <span id="upgrade1Cost">100</span> 🪙</button>
-                <button id="upgrade2">Авто-клікер (+1 монета/сек) - Коштує: <span id="upgrade2Cost">500</span> 🪙</button>
+                <div class="upgrade-item">
+                    <button id="upgrade1">Збільшити клік (+1)</button>
+                    <span>Вартість: <span id="upgrade1Cost">100</span> 🪙</span>
+                </div>
+                <div class="upgrade-item">
+                    <button id="upgrade2">Авто-клікер (+1/сек)</button>
+                    <span>Вартість: <span id="upgrade2Cost">500</span> 🪙</span>
+                </div>
             </div>
         </div>
 
-        <div id="wallet-screen" class="screen-content hidden">
-            <h2>Гаманець</h2>
-            <div class="wallet-info">
-                <p>Твої WEE: <strong id="weeBalance">0.00</strong> WEE</p>
-                <p>Твої монети: <strong id="walletCoinBalance">0</strong> 🪙</p>
-                <p>Курс обміну: 1 000 000 🪙 = 1 WEE</p>
+        <div id="wallet-screen" class="screen hidden main-screen">
+            <h2>Мій Гаманець</h2>
+            <div class="balance-info">
+                <p>Баланс WEE: <span id="weeBalance">0.00</span></p>
+                <p>Баланс Монет: <span id="walletCoinBalance">0</span> 🪙</p>
             </div>
-            <div class="wallet-actions">
-                <p>Введи кількість монет для обміну на WEE:</p>
-                <input type="number" id="exchangeAmount" placeholder="Кількість монет" min="1000000" step="1000000">
-                <button id="exchangeButton">Обміняти монети на WEE</button>
-                <p class="exchange-info" style="font-size:0.9em; opacity:0.8;">Мінімальна сума для обміну: 1 000 000 монет</p>
+            <div class="exchange-section">
+                <h3>Обмін Монет на WEE</h3>
+                <p>Курс: 1 WEE = <span id="exchangeRate">${WEE_EXCHANGE_RATE.toLocaleString()}</span> монет</p>
+                <input type="number" id="exchangeAmount" placeholder="Кількість монет для обміну">
+                <button id="exchangeButton">Обміняти</button>
             </div>
         </div>
 
-        <div id="leaderboard-screen" class="screen-content hidden">
-            <h2>Таблиця лідерів</h2>
-            <p class="leaderboard-reward-info">Щотижня 1000 WEE ділиться між топ-100 лідерів!</p>
+        <div id="leaderboard-screen" class="screen hidden main-screen">
+            <h2>Лідерборд</h2>
+            <button id="refreshLeaderboard">Оновити</button>
             <ul id="leaderboardList" class="leaderboard-list">
-                <li class="leaderboard-item">
-                    <span class="rank">1.</span>
-                    <span class="name">Завантаження...</span>
-                    <span class="score">...</span>
-                </li>
+                <li>Завантаження лідерборду...</li>
             </ul>
-            <button id="refreshLeaderboard">Оновити лідерборд</button>
         </div>
 
-        <div id="tasks-screen" class="screen-content hidden">
+        <div id="tasks-screen" class="screen hidden main-screen">
             <h2>Завдання</h2>
             <ul id="tasksList" class="tasks-list">
-                <li class="task-item">
-                    <h3>Завантаження завдань...</h3>
-                    <p>Будь ласка, зачекайте.</p>
-                </li>
+                <li>Завантаження завдань...</li>
             </ul>
         </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item active" data-screen="game">
-            <span class="nav-icon">🎮</span>
-            <span>Гра</span>
-        </a>
-        <a href="#" class="nav-item" data-screen="wallet">
-            <span class="nav-icon">💰</span>
-            <span>Гаманець</span>
-        </a>
-        <a href="#" class="nav-item" data-screen="leaderboard">
-            <span class="nav-icon">🏆</span>
-            <span>Лідерборд</span>
-        </a>
-        <a href="#" class="nav-item" data-screen="tasks">
-            <span class="nav-icon">📝</span>
-            <span>Завдання</span>
-        </a>
+    </div> <nav class="bottom-nav">
+        <div class="nav-item active" data-screen="game">
+            <span class="icon">🎮</span>
+            <span class="text">Гра</span>
+        </div>
+        <div class="nav-item" data-screen="wallet">
+            <span class="icon">💰</span>
+            <span class="text">Гаманець</span>
+        </div>
+        <div class="nav-item" data-screen="leaderboard">
+            <span class="icon">🏆</span>
+            <span class="text">Лідерборд</span>
+        </div>
+        <div class="nav-item" data-screen="tasks">
+            <span class="icon">✅</span>
+            <span class="text">Завдання</span>
+        </div>
     </nav>
 
     <script src="script.js"></script>
