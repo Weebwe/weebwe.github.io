@@ -1,19 +1,33 @@
 // script.js
-import { firebaseConfig } from './firebase-config.js'; // Імпорт конфігурації
+// Цей файл містить основну логіку вашого веб-додатка.
 
-// Імпортуємо функції з Firebase SDK v9+
+// Імпортуємо конфігурацію Firebase з окремого файлу.
+// Цей файл (firebase-config.js) НЕ ПОВИНЕН БУТИ ЗАВАНТАЖЕНИЙ НА ГІТХАБ!
+import { firebaseConfig } from './firebase-config.js';
+
+// Імпортуємо необхідні функції з Firebase SDK v9+.
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue } from "firebase/database";
 
-// Ініціалізуємо Firebase
-const app = initializeApp(firebaseConfig); // Тепер firebaseConfig імпортується
+// Логуємо початок виконання скрипта.
+console.log("Script.js started.");
+
+// Ініціалізуємо Firebase додаток з імпортованою конфігурацією.
+const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+console.log("Firebase initialized.");
 
-let currentLanguage = 'uk'; // Мова за замовчуванням завжди українська
-let allPagesContent = {}; // Для зберігання всього текстового контенту сторінок
-let allMenuData = {}; // Для зберігання даних меню
+// Змінна для поточної мови (завжди українська, як було обговорено).
+let currentLanguage = 'uk';
+// Об'єкти для зберігання завантаженого контенту та даних меню.
+let allPagesContent = {};
+let allMenuData = {};
 
+// Чекаємо повного завантаження DOM перед виконанням скриптів.
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOMContentLoaded event fired.");
+
+    // Отримуємо посилання на елементи DOM.
     const loadingScreen = document.getElementById('loading-screen');
     const mainContent = document.getElementById('main-content');
     const pages = document.querySelectorAll('.page');
@@ -21,17 +35,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Функції для завантаження даних з Firebase та рендерингу ---
 
-    // Завантаження всього текстового контенту сторінок (Home, About, Contact)
-    // Ця функція також запускає завантаження проєктів та меню після отримання основного контенту
+    /**
+     * Завантажує основний текстовий контент сторінок (Новини, Про компанію, Контакти) з Firebase.
+     * Після успішного завантаження запускає завантаження проєктів та меню,
+     * а потім приховує екран завантаження.
+     */
     onValue(ref(db, 'pages'), (snapshot) => {
+        console.log("Attempting to get data from 'pages' node.");
         allPagesContent = snapshot.val() || {};
-        renderPageContent(); // Оновлюємо контент сторінок Home, About, Contact
-        loadProjects(); // Завантажуємо і рендеримо проекти
-        loadNavMenu(); // Завантажуємо і рендеримо меню
+        console.log("Data for 'pages' received:", allPagesContent);
 
-        // Приховуємо екран завантаження і показуємо основний контент
-        // Додаємо невелику затримку, щоб анімація логотипу встигла показатися
+        // Якщо дані отримано, оновлюємо контент сторінок.
+        renderPageContent();
+        // Завантажуємо та рендеримо проєкти.
+        loadProjects();
+        // Завантажуємо та рендеримо навігаційне меню.
+        loadNavMenu();
+
+        // Приховуємо екран завантаження після затримки.
         setTimeout(() => {
+            console.log("Hiding loading screen and showing main content.");
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
@@ -40,12 +63,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1500); // Затримка перед початком зникнення (для видимості анімації завантаження)
 
     }, (error) => {
-        console.error("Помилка завантаження основного контенту: ", error);
-        // Навіть якщо є помилка, спробуємо відобразити те, що є
+        // Обробка помилок при завантаженні основного контенту.
+        console.error("Помилка завантаження основного контенту з Firebase: ", error);
+        // Навіть якщо є помилка, спробуємо відобразити те, що є, і приховати екран завантаження.
         renderPageContent();
         loadProjects();
         loadNavMenu();
         setTimeout(() => {
+            console.log("Hiding loading screen even with an error.");
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
@@ -54,9 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1500);
     });
 
-    // Рендеринг контенту сторінок (Новини, Про компанію, Контакти)
+    /**
+     * Рендерить текстовий контент для сторінок "Новини", "Про компанію", "Контакти".
+     */
     function renderPageContent() {
-        // *************** НОВА ГОЛОВНА СТОРІНКА (НОВИНИ) ***************
+        console.log("Rendering page content...");
+
+        // --- НОВА ГОЛОВНА СТОРІНКА (НОВИНИ) ---
         const homePageData = allPagesContent.home;
         if (homePageData) {
             document.getElementById('home-title').innerText = homePageData[`title_${currentLanguage}`];
@@ -65,8 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             onValue(ref(db, 'news_articles'), (snapshot) => {
                 const newsArticles = snapshot.val() || {};
+                console.log("News articles data:", newsArticles);
                 if (newsArticles) {
-                    // Перетворюємо об'єкт новин на масив і сортуємо за датою (від найновіших)
+                    // Перетворюємо об'єкт новин на масив і сортуємо за датою (від найновіших).
                     const sortedNews = Object.keys(newsArticles).map(key => ({
                         id: key,
                         ...newsArticles[key]
@@ -91,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // *************** СТОРІНКА ПРО КОМПАНІЮ (колишні "Послуги") ***************
+        // --- СТОРІНКА ПРО КОМПАНІЮ (колишні "Послуги") ---
         const aboutPageData = allPagesContent.about;
         if (aboutPageData) {
             document.getElementById('about-title').innerText = aboutPageData[`title_${currentLanguage}`];
@@ -103,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
-        // *************** СТОРІНКА КОНТАКТІВ ***************
+        // --- СТОРІНКА КОНТАКТІВ ---
         const contactPageData = allPagesContent.contact;
         if (contactPageData) {
             document.getElementById('contact-title').innerText = contactPageData[`title_${currentLanguage}`];
@@ -112,16 +142,20 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('contact-telegram').innerHTML = `💬 Telegram: <a href="https://t.me/${contactPageData.telegram_ua.substring(1)}" target="_blank">${contactPageData.telegram_ua}</a>`;
         }
 
-        // Оновлюємо заголовок сторінки
+        // Оновлюємо заголовок сторінки в браузері.
         updatePageTitle();
     }
 
-    // Завантаження проектів
+    /**
+     * Завантажує та рендерить список проєктів з Firebase.
+     */
     function loadProjects() {
+        console.log("Loading projects...");
         onValue(ref(db, 'projects'), (snapshot) => {
             const projectsListDiv = document.getElementById('projects-list');
             projectsListDiv.innerHTML = ''; // Очищаємо попередній список
             const projects = snapshot.val();
+            console.log("Projects data:", projects);
 
             if (projects) {
                 Object.keys(projects).forEach(key => {
@@ -149,27 +183,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Завантаження та рендеринг навігаційного меню
+    /**
+     * Завантажує та рендерить навігаційне меню у футері.
+     */
     function loadNavMenu() {
+        console.log("Loading navigation menu...");
         onValue(ref(db, 'menu_items'), (snapshot) => {
             allMenuData = snapshot.val() || {};
             navMenuContainer.innerHTML = ''; // Очищаємо перед додаванням
+            console.log("Menu data:", allMenuData);
 
-            // Визначений порядок кнопок
+            // Визначений порядок кнопок для меню.
             const menuOrder = ['home-page', 'about-page', 'projects-page', 'contact-page'];
             menuOrder.forEach(pageId => {
                 const item = allMenuData[pageId];
-                if (item) { // Перевірка наявності елемента в Firebase
+                if (item) { // Перевіряємо наявність елемента в Firebase.
                     const button = document.createElement('button');
                     button.className = 'nav-button';
                     button.setAttribute('data-page', pageId);
-                    button.setAttribute('onclick', `showPage('${pageId}')`);
+                    button.setAttribute('onclick', `showPage('${pageId}')`); // Прив'язуємо функцію showPage
                     button.innerHTML = `<span>${item.icon}</span> <span>${item[`text_${currentLanguage}`]}</span>`;
                     navMenuContainer.appendChild(button);
                 }
             });
-            // Показуємо домашню сторінку за замовчуванням після завантаження меню
-            // Перевіряємо, чи є кнопки меню, перш ніж викликати showPage
+            // Показуємо домашню сторінку за замовчуванням після завантаження меню.
             if (navMenuContainer.children.length > 0) {
                 showPage('home-page');
             }
@@ -179,14 +216,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Функція для перемикання сторінок
+    /**
+     * Функція для перемикання видимості сторінок та оновлення активної кнопки меню.
+     * Доступна глобально через `window.showPage`.
+     * @param {string} pageId - ID сторінки, яку потрібно показати (наприклад, 'home-page').
+     */
     window.showPage = function(pageId) {
+        console.log(`Showing page: ${pageId}`);
         pages.forEach(page => {
-            page.style.display = 'none'; // Приховуємо всі сторінки
+            page.style.display = 'none'; // Приховуємо всі сторінки.
         });
-        document.getElementById(pageId).style.display = 'block'; // Показуємо обрану сторінку
+        document.getElementById(pageId).style.display = 'block'; // Показуємо обрану сторінку.
 
-        // Оновлення активної кнопки меню
+        // Оновлюємо активну кнопку меню.
         const navButtons = document.querySelectorAll('.nav-button');
         navButtons.forEach(button => {
             button.classList.remove('active');
@@ -196,19 +238,23 @@ document.addEventListener('DOMContentLoaded', function() {
             activeButton.classList.add('active');
         }
 
-        updatePageTitle(); // Оновлюємо заголовок сторінки
+        updatePageTitle(); // Оновлюємо заголовок сторінки в браузері.
     };
 
-    // Функція для оновлення заголовка сторінки в браузері
+    /**
+     * Оновлює заголовок сторінки в вкладці браузера відповідно до активної сторінки.
+     */
     function updatePageTitle() {
         const activePageId = document.querySelector('.page[style*="display: block"]')?.id;
-        let pageTitle = 'Weebwe LLC'; // Заголовок за замовчуванням
+        let pageTitle = 'Weebwe LLC'; // Заголовок за замовчуванням.
 
+        // Отримуємо назву сторінки з даних Firebase.
         if (activePageId && allPagesContent[activePageId.replace('-page', '')]) {
             pageTitle = allPagesContent[activePageId.replace('-page', '')][`title_${currentLanguage}`] || pageTitle;
         } else if (activePageId === 'home-page' && allPagesContent.home) {
             pageTitle = allPagesContent.home[`title_${currentLanguage}`] || pageTitle;
         }
         document.title = pageTitle;
+        console.log("Document title updated to:", document.title);
     }
 }); // Кінець DOMContentLoaded
