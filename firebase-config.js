@@ -1,10 +1,8 @@
-// firebase-config.js
-// Цей файл містить ваші конфігураційні дані Firebase.
-// НЕ ЗАВАНТАЖУЙТЕ ЙОГО НА ГІТХАБ!
-
-export const firebaseConfig = {
-  apiKey: "AIzaSyCs449Tb9Oi8xBXzC64zIRgJhY9S3rQKTM", // Ваш API Key
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCs449Tb9Oi8xBXzC64zIRgJhY9S3rQKTM",
   authDomain: "weebwe-llc.firebaseapp.com",
+  databaseURL: "https://weebwe-llc-default-rtdb.firebaseio.com",
   projectId: "weebwe-llc",
   storageBucket: "weebwe-llc.firebasestorage.app",
   messagingSenderId: "298492598941",
