@@ -1,0 +1,318 @@
+/* ОСНОВНІ СТИЛІ */
+body {
+    font-family: Arial, sans-serif;
+    background: #fff; /* Корпоративний білий */
+    color: #222;
+    margin: 0;
+    padding-bottom: 100px; /* Збільшений відступ для більшого фіксованого меню */
+    overflow-x: hidden; /* Запобігає горизонтальному скролу через анімації */
+    min-height: 100vh; /* Щоб footer був внизу */
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Для фіксованого футера */
+}
+
+/* КОНТЕЙНЕР ОСНОВНОГО КОНТЕНТУ (без екрана завантаження) */
+#main-content {
+    display: none; /* За замовчуванням прихований, поки не зникне екран завантаження */
+    flex-grow: 1; /* Дозволяє контенту займати весь доступний простір */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #0094FE; /* Корпоративний синій */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+header h1 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+header p {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+main {
+    flex-grow: 1; /* Щоб контент заповнював простір між хедером та футером */
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    position: relative; /* Для позиціонування сторінок */
+}
+
+/* Стилі для сторінок */
+.page {
+    display: none; /* За замовчуванням всі сторінки, крім активної, приховані */
+    animation: fadeInPage 0.8s ease-out forwards; /* Анімація появи сторінки */
+}
+
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1, h2, h3 {
+    margin-top: 0;
+    color: #0094FE; /* Корпоративний синій для заголовків */
+}
+
+.section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+a {
+    color: #0094FE;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* НАВІГАЦІЙНЕ МЕНЮ (FOOTER) - ОНОВЛЕНО */
+footer {
+    position: fixed; /* Фіксоване положення */
+    bottom: 0; /* Внизу екрана */
+    left: 0;
+    width: 100%;
+    background: #0094FE; /* Корпоративний синій - ВЕСЬ БЛОК МЕНЮ */
+    border-top: 1px solid #007bff; /* Трохи темніша лінія */
+    padding: 8px 0; /* Зменшений паддінг, бо кнопки більші */
+    text-align: center;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.3); /* Сильніша тінь */
+    z-index: 1000; /* Перекриває інший контент */
+    display: flex;
+    justify-content: space-around; /* Рівномірний розподіл кнопок */
+    align-items: center;
+    gap: 5px; /* Відстань між кнопками */
+    height: 65px; /* Зменшена висота футера для більших кнопок */
+}
+
+#nav-menu-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%; /* Займає всю доступну ширину футера */
+}
+
+.nav-button {
+    background-color: white; /* КНОПКИ БІЛІ */
+    color: #0094FE; /* НАПИСИ ФІРМОВИМ КОЛЬОРОМ */
+    padding: 8px 8px; /* Зменшений паддінг кнопок */
+    border: none;
+    border-radius: 8px; /* Більш округлі кути */
+    font-size: 1em; /* Зменшений розмір шрифту */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1; /* Дозволяє кнопкам розтягуватися */
+    max-width: 100px; /* Максимальна ширина кнопки */
+    height: auto; /* Дозволяє кнопкам адаптуватися до паддінгу */
+}
+
+.nav-button:hover {
+    background-color: #f0f0f0; /* Легкий сірий для ховеру білих кнопок */
+    transform: translateY(-5px); /* Більше підняття */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Сильніша тінь при ховері */
+}
+
+.nav-button span {
+    font-size: 1.8em; /* Зменшений розмір емоджі */
+    line-height: 1;
+    margin-bottom: 3px; /* Зменшений відступ */
+}
+.nav-button.active {
+    background-color: #7FFF00; /* САЛАТОВИЙ КОЛІР ДЛЯ АКТИВНОЇ КНОПКИ */
+    color: #222; /* Чорний або темний колір для тексту на салатовому фоні */
+    transform: translateY(-3px); /* Менше підняття для активної */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    font-weight: bold; /* Можливо, зробити жирнішим для кращої видимості */
+}
+/* Колір іконок в активній кнопці */
+.nav-button.active span {
+    color: #222; /* Також змінити колір емоджі на темний */
+}
+
+/* СТИЛІ АНІМОВАНОГО ЛОГОТИПУ КОМПАНІЇ (Weebwe LLC) */
+.animated-logo-wrapper {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.logo-shape {
+    width: 150px;
+    height: 150px;
+    border-radius: 20px; /* Для форми "W" логотипу компанії */
+    background-color: #0094FE; /* Корпоративний синій */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform-origin: center center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logo-letter {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 6em;
+    font-weight: bold;
+    color: white; /* Корпоративний білий */
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* АНІМАЦІЇ ЛОГОТИПУ КОМПАНІЇ */
+@keyframes slideInLeftCombined {
+    0% { transform: translateX(-200px) scale(0); opacity: 0; }
+    60% { transform: translateX(0) scale(1); opacity: 1; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes perspectiveRotateCombined {
+    0% { transform: perspective(250px) rotateY(0deg); }
+    100% { transform: perspective(250px) rotateY(360deg); }
+}
+
+.logo-shape {
+    animation: slideInLeftCombined 2s ease-out forwards,
+               perspectiveRotateCombined 3s linear 1.5s infinite;
+    transform-style: preserve-3d;
+}
+
+.logo-letter {
+    animation: textPerspectiveRotateCombined 3s linear 1.5s infinite;
+}
+
+@keyframes textPerspectiveRotateCombined {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(-360deg); }
+}
+
+/* СТИЛІ ЕКРАНУ ЗАВАНТАЖЕННЯ - ОНОВЛЕНО */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff; /* Білий фон завантаження */
+    color: #0094FE;
+    font-size: 2em;
+    text-align: center;
+    z-index: 9999; /* Перекриває все інше */
+    transition: opacity 0.5s ease-out; /* Плавне зникнення */
+}
+
+#loading-screen .animated-logo-wrapper {
+    margin-bottom: 20px;
+    width: 180px; /* Трохи більше для завантаження */
+    height: 180px;
+}
+#loading-screen .logo-shape {
+    width: 180px;
+    height: 180px;
+}
+#loading-screen .logo-letter {
+    font-size: 7em;
+}
+
+/* СТИЛІ ПРОЕКТІВ */
+.project-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.project-card h3 {
+    color: #0094FE;
+    margin-top: 0;
+    font-size: 1.8em;
+}
+
+/* НОВІ СТИЛІ ДЛЯ ЛОГОТИПУ WeeClick */
+.weeclick-logo-wrapper {
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 50%; /* Кругла форма */
+    overflow: hidden;
+    background-color: white;
+    border: 8px solid #0094FE;
+    animation: perspectiveRotateCombined 3s linear 1.5s infinite;
+    transform-style: preserve-3d;
+}
+
+.weeclick-logo-text {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 3.5em;
+    font-weight: bold;
+    color: #0094FE;
+    position: relative;
+    z-index: 2;
+    line-height: 1;
+    animation: textPerspectiveRotateCombined 3s linear 1.5s infinite;
+}
+
+/* Стилі для карток новин */
+.news-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: left; /* Новини зазвичай з лівим вирівнюванням */
+}
+
+.news-card h3 {
+    color: #0094FE;
+    margin-top: 0;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.news-card .news-date {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.news-card p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
