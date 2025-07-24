@@ -1,499 +1,886 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weebwe LLC - Веб-сайт</title>
-    <meta name="description" content="Weebwe LLC - Innovative IT Company specializing in web platforms, mobile apps, Telegram games, and blockchain solutions.">
-    <link rel="icon" href="path/to/your/favicon.ico" type="image/x-icon"> <style>
-        /* CSS Variables for Corporate Colors */
-        :root {
-            --corporate-blue: #0094FE;
-            --corporate-white: #fff;
-            --active-button-bg: #7FFF00; /* Салатовий колір */
-            --dark-text: #222;
-            --light-grey: #f9f9f9;
-            --border-grey: #e0e0e0;
-            --shadow-light: rgba(0,0,0,0.1);
-            --shadow-medium: rgba(0,0,0,0.2);
-            --shadow-strong: rgba(0,0,0,0.3);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEEBWE LLC</title>
+  <link rel="icon" href="ico.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --primary-color: #0094FE;
+      --background-color: #f2f9ff;
+      --text-color: #222;
+      --highlight-color: #007bff; /* Колір для підсвітки активного пункту */
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden; /* Приховуємо скролл на рівні body для ефекту окремих екранів */
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      justify-content: space-between;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .language-button {
+      padding: 8px 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .language-button:hover {
+      background-color: #007bff;
+    }
+
+    header img {
+      height: 32px;
+      margin-right: 0.75rem;
+      /* Анімація для логотипу */
+      animation: rotateAndScale 3s infinite ease-in-out;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+
+    main {
+      flex: 1;
+      padding-top: 60px; /* Відступ для фіксованої верхньої панелі */
+      padding-bottom: 60px; /* Відступ для фіксованої нижньої панелі */
+      position: relative;
+      overflow-y: auto; /* Дозволяємо скролл для основного контенту, якщо його багато */
+      -webkit-overflow-scrolling: touch; /* Для плавного скроллу на iOS */
+    }
+
+    section {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      min-height: calc(100% - 120px); /* Змінено на min-height */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start; /* Вирівнюємо контент до верху */
+      text-align: center;
+      padding: 2rem 1rem;
+      background-color: var(--background-color);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease-out;
+      box-sizing: border-box; /* Враховуємо padding у розмірі */
+    }
+
+    section.active {
+      opacity: 1;
+      pointer-events: auto;
+      position: relative; /* Дозволяємо секції займати місце в потоці для скроллу */
+      top: 0; /* Прибираємо фіксоване позиціонування, коли активна */
+    }
+
+    section h2 {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      animation: fadeInFromTop 0.8s ease-out;
+    }
+
+    section p {
+      margin-bottom: 1rem;
+      animation: fadeInFromBottom 0.8s ease-out;
+      max-width: 800px; /* Обмеження ширини тексту для читабельності */
+      text-align: justify; /* Вирівнювання тексту по ширині */
+    }
+
+    /* Стилі для новин та проектів */
+    .content-list {
+        margin-top: 2rem;
+        width: 100%;
+        max-width: 800px;
+        text-align: left;
+    }
+
+    .list-item {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInFromBottom 0.8s ease-out forwards;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Вирівнювання елементів всередині по лівому краю */
+    }
+
+    .list-item:nth-child(2) { animation-delay: 0.2s; }
+    .list-item:nth-child(3) { animation-delay: 0.4s; }
+    .list-item:nth-child(4) { animation-delay: 0.6s; }
+
+    .list-item h3 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .list-item p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+        text-align: left; /* Вирівнюємо текст по лівому краю */
+        width: 100%; /* Займає всю доступну ширину */
+    }
+
+    .list-item .item-meta {
+        font-size: 0.8rem;
+        color: #777;
+        text-align: right;
+        width: 100%; /* Займає всю доступну ширину */
+    }
+
+    /* Стилі для проектів */
+    .project-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Центруємо вміст проекту */
+        text-align: center; /* Центруємо текст всередині проекту */
+        padding: 1.5rem;
+    }
+
+    .project-item img {
+        width: 80px; /* Розмір іконки проекту */
+        height: 80px;
+        margin-bottom: 1rem;
+        border-radius: 15px; /* Заокруглені кути для іконки */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .project-item h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .project-item p {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        max-width: 600px; /* Обмеження ширини опису проекту */
+        text-align: center; /* Центруємо опис проекту */
+    }
+
+    .project-item .project-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .project-item .project-button:hover {
+        background-color: #007bff;
+    }
+
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.5rem 0;
+      background-color: white;
+      border-top: 1px solid #ccc;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      transition: all 0.3s ease-in-out;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 5px;
+      position: relative;
+      z-index: 1;
+      transition: color 0.2s ease-in-out;
+    }
+
+    nav a.active span {
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    nav svg {
+      height: 24px;
+      width: 24px;
+      fill: #0094FE;
+      margin-bottom: 0.25rem;
+      transition: fill 0.2s ease-in-out;
+    }
+
+    nav a.active svg {
+      fill: var(--highlight-color);
+    }
+
+    #nav-highlight {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background-color: var(--highlight-color);
+      transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+      z-index: 0;
+    }
+
+    /* Модальне вікно */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 450px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      text-align: center;
+      animation: zoomIn 0.3s ease-out;
+    }
+
+    .close-button {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .modal-flags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px 10px;
+      margin-top: 20px;
+    }
+
+    .lang-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+        width: 80px;
+    }
+
+    .lang-option:hover {
+        transform: scale(1.05);
+    }
+
+    .lang-option img {
+      height: 40px;
+      width: 60px;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .lang-option span {
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: var(--text-color);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    @media (min-width: 600px) {
+      section h2 {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* Keyframe анімації */
+    @keyframes fadeInFromTop {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInFromBottom {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes rotateAndScale {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+      25% {
+        transform: rotate(10deg) scale(1.1);
+      }
+      50% {
+        transform: rotate(0deg) scale(1);
+      }
+      75% {
+        transform: rotate(-10deg) scale(1.1);
+      }
+      100% {
+        transform: rotate(0deg) scale(1);
+      }
+    }
+  </style>
+  <script type="module">
+    // Імпортуємо необхідні функції з Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Ваша конфігурація веб-додатку Firebase
+    // Ця конфігурація є публічною і призначена для клієнтського доступу.
+    // Завжди використовуйте правила безпеки Firebase для захисту даних.
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsohWLnv25QxjdexHjq7dJ4TyIPIteuKQ", // <-- ВСТАВТЕ СВІЙ API KEY
+      authDomain: "weebwe-c2843.firebaseapp.com", // <-- ВСТАВТЕ СВІЙ AUTH DOMAIN
+      projectId: "weebwe-c2843", // <-- ВСТАВТЕ СВІЙ PROJECT ID
+      storageBucket: "weebwe-c2843.firebasestorage.app", // <-- ВСТАВТЕ СВІЙ STORAGE BUCKET
+      messagingSenderId: "300409346252", // <-- ВСТАВТЕ СВІЙ MESSAGING SENDER ID
+      appId: "1:300409346252:web:36f901918a394761454a69", // <-- ВСТАВТЕ СВІЙ APP ID
+      measurementId: "G-TFG3W268W5" // <-- ВСТАВТЕ СВІЙ MEASUREMENT ID (якщо використовуєте Analytics)
+    };
+
+    // Ініціалізуємо Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Змінні для зберігання стану програми
+    let currentTranslations = {}; // Зберігаємо поточні переклади
+    let currentLanguage = 'uk'; // Мова за замовчуванням
+    let currentSection = 'home'; // Зберігає ID поточної активної секції
+
+    const main = document.querySelector('main');
+    const languageModal = document.getElementById('languageModal');
+
+    /**
+     * Завантажує переклади з Firestore для вказаної мови.
+     * Якщо переклади для мови не знайдено, намагається завантажити англійські.
+     * @param {string} lang - Код мови (наприклад, 'uk', 'en').
+     */
+    async function loadTranslations(lang) {
+      try {
+        const docRef = doc(db, "content", lang);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          currentTranslations = docSnap.data();
+          console.log(`Translations for '${lang}' loaded.`);
+        } else {
+          console.warn(`No translations found for language: ${lang}. Attempting to load 'en'.`);
+          // Резервний варіант: завантажуємо англійські переклади, якщо для запитуваної мови немає
+          if (lang !== 'en') {
+            const enDocRef = doc(db, "content", "en");
+            const enDocSnap = await getDoc(enDocRef);
+            if (enDocSnap.exists()) {
+                currentTranslations = enDocSnap.data();
+                console.log("Fallback to English translations loaded.");
+            } else {
+                console.error("No English translations found either. Content may be empty.");
+                currentTranslations = {}; // Забезпечуємо порожній об'єкт перекладів
+            }
+          } else {
+              currentTranslations = {}; // Забезпечуємо порожній об'єкт перекладів, якщо англійських також немає
+          }
+        }
+      } catch (error) {
+        console.error("Error loading translations:", error);
+        currentTranslations = {}; // Забезпечуємо порожній об'єкт перекладів у разі помилки
+      }
+    }
+
+    /**
+     * Застосовує поточні переклади до всіх елементів з атрибутом `data-lang-key`.
+     */
+    function applyTranslations() {
+      document.querySelectorAll('[data-lang-key]').forEach(element => {
+        const key = element.getAttribute('data-lang-key');
+        if (currentTranslations && currentTranslations[key]) {
+          element.textContent = currentTranslations[key];
+        } else {
+            // Залишаємо оригінальний текст або можна додати:
+            // element.textContent = `[${key}]`; // Для налагодження: показувати ключ, якщо переклад відсутній
+        }
+      });
+      // Оновлюємо текст кнопки вибору мови
+      document.querySelector('.language-button').textContent = currentTranslations.language_button || "Language";
+    }
+
+    /**
+     * Завантажує та відображає новини з Firestore.
+     */
+    async function loadNews() {
+      const newsList = document.getElementById('news-list');
+      newsList.innerHTML = `<p>${currentTranslations.loading_content || "Loading news..."}</p>`; // Показуємо повідомлення про завантаження
+
+      try {
+        const newsCollectionRef = collection(db, "news");
+        const q = query(newsCollectionRef, orderBy("order", "asc")); // Сортування за полем 'order'
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          newsList.innerHTML = `<p>${currentTranslations.no_news || "No news available."}</p>`;
+          return;
         }
 
-        /* ОСНОВНІ СТИЛІ */
-        body {
-            font-family: Arial, sans-serif;
-            background: var(--corporate-white); /* Корпоративний білий */
-            color: var(--dark-text);
-            margin: 0;
-            padding-bottom: 100px;
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            line-height: 1.6; /* Improved readability */
+        newsList.innerHTML = ''; // Очищаємо повідомлення про завантаження
+        querySnapshot.forEach((doc) => {
+          const news = doc.data();
+          const titleKey = `title_${currentLanguage}`;
+          const textKey = `text_${currentLanguage}`;
+
+          const newsItem = document.createElement('div');
+          newsItem.classList.add('list-item');
+          newsItem.innerHTML = `
+            <h3>${news[titleKey] || news.title_en || 'No Title'}</h3>
+            <p>${news[textKey] || news.text_en || 'No description available.'}</p>
+            <p class="item-meta">${news.date || ''}</p>
+          `;
+          newsList.appendChild(newsItem);
+        });
+      } catch (error) {
+        console.error("Error loading news:", error);
+        newsList.innerHTML = `<p>${currentTranslations.error_loading_news || "Error loading news."}</p>`;
+      }
+    }
+
+    /**
+     * Завантажує та відображає проекти з Firestore.
+     */
+    async function loadProjects() {
+      const projectsList = document.getElementById('projects-list');
+      projectsList.innerHTML = `<p>${currentTranslations.loading_content || "Loading projects..."}</p>`; // Показуємо повідомлення про завантаження
+
+      try {
+        const projectsCollectionRef = collection(db, "projects");
+        const q = query(projectsCollectionRef, orderBy("order", "asc")); // Сортування за полем 'order'
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          projectsList.innerHTML = `<p>${currentTranslations.no_projects || "No projects available."}</p>`;
+          return;
         }
 
-        /* КОНТЕЙНЕР ОСНОВНОГО КОНТЕНТУ */
-        #main-content {
-            display: none; /* За замовчуванням прихований, поки не зникне екран завантаження */
-            flex-grow: 1; /* Дозволяє контенту займати весь доступний простір */
-            flex-direction: column;
-            min-height: 100vh;
+        projectsList.innerHTML = ''; // Очищаємо повідомлення про завантаження
+        const projectButtonText = currentTranslations.project_button_text || "Go to Project";
+        querySnapshot.forEach((doc) => {
+          const project = doc.data();
+          const titleKey = `title_${currentLanguage}`;
+          const descriptionKey = `description_${currentLanguage}`;
+
+          const projectItem = document.createElement('div');
+          projectItem.classList.add('list-item', 'project-item');
+          projectItem.innerHTML = `
+            <img src="${project.iconUrl || 'default_project_icon.svg'}" alt="${project[titleKey] || project.title_en || 'Project'} Icon">
+            <h3>${project[titleKey] || project.title_en || 'No Title'}</h3>
+            <p>${project[descriptionKey] || project.description_en || 'No description available.'}</p>
+            <a href="${project.projectLink || '#'}" class="project-button" target="_blank">${projectButtonText}</a>
+          `;
+          projectsList.appendChild(projectItem);
+        });
+      } catch (error) {
+        console.error("Error loading projects:", error);
+        projectsList.innerHTML = `<p>${currentTranslations.error_loading_projects || "Error loading projects."}</p>`;
+      }
+    }
+
+    /**
+     * Оновлює статичні посилання та тексти для секції "Документи" на основі перекладів.
+     * Примітка: Якщо ви плануєте динамічно завантажувати список документів з Firestore,
+     * потрібно створити окрему колекцію "documents" і адаптувати цю функцію.
+     */
+    async function loadDocs() {
+      const docsList = document.getElementById('docs-list');
+      // Оновлюємо href для посилань документів
+      const doc1LinkElem = docsList.querySelector('[data-lang-key="doc_1_link"]');
+      if (doc1LinkElem && currentTranslations.doc_1_url) {
+          doc1LinkElem.href = currentTranslations.doc_1_url;
+      }
+
+      const doc2LinkElem = docsList.querySelector('[data-lang-key="doc_2_link"]');
+      if (doc2LinkElem && currentTranslations.doc_2_url) {
+          doc2LinkElem.href = currentTranslations.doc_2_url;
+      }
+
+      const doc3LinkElem = docsList.querySelector('[data-lang-key="doc_3_link"]');
+      if (doc3LinkElem && currentTranslations.doc_3_url) {
+          doc3LinkElem.href = currentTranslations.doc_3_url;
+      }
+      applyTranslations(); // Застосувати переклади для текстів H3, P та A
+    }
+
+    /**
+     * Оновлює статичні посилання та тексти для секції "Контакти" на основі перекладів.
+     * Примітка: Якщо ви плануєте динамічно завантажувати список контактів з Firestore,
+     * потрібно створити окрему колекцію "contacts" і адаптувати цю функцію.
+     */
+    async function loadContact() {
+        const contactList = document.getElementById('contact-list');
+        // Оновлюємо href для посилань контактів
+        const telegramLinkElement = contactList.querySelector('[data-lang-key="contact_telegram_link"]');
+        if (telegramLinkElement && currentTranslations.contact_telegram_url) {
+            telegramLinkElement.href = currentTranslations.contact_telegram_url;
         }
 
-        header {
-            background-color: var(--corporate-blue);
-            color: var(--corporate-white);
-            padding: 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px var(--shadow-medium);
-        }
-        header h1 {
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-        header p {
-            margin-top: 0;
-            margin-bottom: 20px;
+        const emailLinkElement = contactList.querySelector('[data-lang-key="contact_email_link"]');
+        if (emailLinkElement && currentTranslations.contact_email_address) {
+            emailLinkElement.href = `mailto:${currentTranslations.contact_email_address}`;
+            emailLinkElement.textContent = currentTranslations.contact_email_address; // Забезпечуємо оновлення тексту електронної пошти
         }
 
-        main {
-            flex-grow: 1;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-            position: relative;
+        const supportLinkElement = contactList.querySelector('[data-lang-key="contact_support_link"]');
+        if (supportLinkElement && currentTranslations.contact_support_url) {
+            supportLinkElement.href = currentTranslations.contact_support_url;
         }
+        applyTranslations(); // Застосувати переклади для текстів H3, P та A
+    }
 
-        /* Стилі для сторінок */
-        .page {
-            display: none; /* За замовчуванням всі сторінки, крім активної, приховані */
-            animation: fadeInPage 0.8s ease-out forwards; /* Анімація появи сторінки */
-        }
+    /**
+     * Показує вказаний розділ та оновлює навігацію.
+     * @param {string} id - ID розділу для відображення.
+     */
+    function showSection(id) {
+      if (id === currentSection) return;
 
-        @keyframes fadeInPage {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+      const currentActiveSection = document.getElementById(currentSection);
+      const newActiveSection = document.getElementById(id);
 
-        h1, h2, h3 {
-            margin-top: 0;
-            color: var(--corporate-blue);
-        }
+      if (currentActiveSection) {
+        currentActiveSection.classList.remove('active');
+      }
 
-        .section {
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: var(--light-grey);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px var(--shadow-light);
-        }
+      document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+      });
+      document.querySelector(`nav a[data-section="${id}"]`).classList.add('active');
 
-        a {
-            color: var(--corporate-blue);
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+      updateNavHighlight(document.querySelector(`nav a[data-section="${id}"]`));
 
-        /* НАВІГАЦІЙНЕ МЕНЮ (FOOTER) */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--corporate-blue);
-            border-top: 1px solid #007bff;
-            padding: 10px 0;
-            text-align: center;
-            box-shadow: 0 -2px 8px var(--shadow-strong);
-            z-index: 1000;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 5px;
-            height: 80px;
-        }
+      newActiveSection.classList.add('active');
+      currentSection = id;
 
-        .nav-button {
-            background-color: var(--corporate-white);
-            color: var(--corporate-blue);
-            padding: 12px 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-            max-width: 120px;
-            height: 100%;
-        }
+      main.scrollTop = 0; // Скидаємо скролл при зміні секції
 
-        .nav-button:hover {
-            background-color: #f0f0f0;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px var(--shadow-strong);
-        }
+      // Завантажуємо дані для активної секції
+      if (id === 'home') {
+        loadNews();
+      } else if (id === 'projects') {
+        loadProjects();
+      } else if (id === 'docs') {
+        loadDocs();
+      } else if (id === 'contact') {
+        loadContact();
+      }
+    }
 
-        .nav-button:focus { /* Added focus state */
-            outline: 2px solid var(--corporate-blue);
-            outline-offset: 3px;
-        }
+    /**
+     * Оновлює положення та розмір підсвічування в навігаційному меню.
+     * @param {HTMLElement} activeLink - Активне посилання навігації.
+     */
+    function updateNavHighlight(activeLink) {
+      const highlight = document.getElementById('nav-highlight');
+      if (activeLink) {
+        highlight.style.width = `${activeLink.offsetWidth}px`;
+        highlight.style.transform = `translateX(${activeLink.offsetLeft}px)`;
+      }
+    }
 
-        .nav-button span {
-            font-size: 2em;
-            line-height: 1;
-            margin-bottom: 5px;
-        }
-        .nav-button.active {
-            background-color: var(--active-button-bg);
-            color: var(--dark-text);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px var(--shadow-medium);
-            font-weight: bold;
-        }
-        .nav-button.active span {
-            color: var(--dark-text);
-        }
-        /* СТИЛІ 3D АНІМОВАНОГО ЛОГОТИПУ КОМПАНІЇ (Weebwe LLC) */
-        .animated-logo-wrapper {
-            width: 150px;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-            perspective: 500px; /* Add perspective here for the wrapper */
-        }
+    /** Відкриває модальне вікно вибору мови. */
+    window.openLanguageModal = function() { // Зроблено глобальною для виклику з onclick
+      languageModal.style.display = 'flex';
+      main.style.overflowY = 'hidden'; // Запобігти прокручуванню основного вмісту
+    }
 
-        .logo-shape {
-            width: 150px;
-            height: 150px;
-            border-radius: 20px;
-            background: linear-gradient(45deg, var(--corporate-blue) 60%, #007bff); /* Subtle gradient */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            transform-origin: center center;
-            box-shadow: 0 4px 8px var(--shadow-light);
-            transform-style: preserve-3d; /* Ensure 3D context for children */
-        }
+    /** Закриває модальне вікно вибору мови. */
+    window.closeLanguageModal = function() { // Зроблено глобальною для виклику з onclick
+      languageModal.style.display = 'none';
+      main.style.overflowY = 'auto'; // Дозволити прокручування основного вмісту
+    }
 
-        .logo-letter {
-            font-family: 'Arial Black', sans-serif;
-            font-size: 6em;
-            font-weight: bold;
-            color: var(--corporate-white);
-            line-height: 1;
-            text-shadow: 2px 2px 4px var(--shadow-strong);
-            transform-style: preserve-3d;
-            /* transform: translateZ(10px); /* Slightly push the letter forward */ */
-        }
+    /**
+     * Вибирає мову, завантажує переклади та закриває модальне вікно.
+     * @param {string} lang - Вибраний код мови.
+     */
+    window.selectLanguageAndClose = async function(lang) { // Зроблено глобальною для виклику з onclick
+      currentLanguage = lang;
+      await loadTranslations(currentLanguage); // Завантажуємо переклади для обраної мови
+      applyTranslations(); // Застосовуємо завантажені переклади
 
-        /* 3D АНІМАЦІЇ ЛОГОТИПУ КОМПАНІЇ */
-        @keyframes slideInLeftCombined {
-            0% { transform: translateX(-200px) scale(0) rotateY(0deg) rotateX(0deg); opacity: 0; }
-            60% { transform: translateX(0) scale(1) rotateY(0deg) rotateX(0deg); opacity: 1; }
-            100% { transform: translateX(0) scale(1) rotateY(0deg) rotateX(0deg); opacity: 1; }
-        }
+      // Повторно завантажуємо динамічний контент, щоб він також оновився мовою
+      if (currentSection === 'home') await loadNews();
+      if (currentSection === 'projects') await loadProjects();
+      if (currentSection === 'docs') await loadDocs();
+      if (currentSection === 'contact') await loadContact();
 
-        @keyframes perspectiveRotateCombined {
-            0% { transform: perspective(500px) rotateY(0deg) rotateX(15deg); } /* Added slight X rotation */
-            100% { transform: perspective(500px) rotateY(360deg) rotateX(15deg); }
-        }
+      closeLanguageModal();
+    }
 
-        .logo-shape {
-            animation: slideInLeftCombined 2s ease-out forwards,
-                       perspectiveRotateCombined 3s linear 1.5s infinite;
-            transform-style: preserve-3d;
-        }
+    // Закриття модального вікна, якщо клікнуто поза його вмістом
+    window.onclick = function(event) {
+      if (event.target == languageModal) {
+        closeLanguageModal();
+      }
+    }
 
-        .logo-letter {
-            animation: textPerspectiveRotateCombined 3s linear 1.5s infinite;
-        }
+    // Ініціалізація при завантаженні сторінки
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Чекаємо, поки Firebase SDK буде доступний
+      // Оскільки Firebase SDK імпортується як модуль, він буде доступний
+      // до виконання цього DOMContentLoaded, якщо немає помилок завантаження.
+      // Попередній Promise/setTimeout видалено для спрощення.
 
-        @keyframes textPerspectiveRotateCombined {
-            0% { transform: rotateY(0deg) translateZ(5px); } /* Slight Z translation */
-            100% { transform: rotateY(-360deg) translateZ(5px); }
-        }
+      // Завантажуємо переклади перед тим, як показувати секції
+      await loadTranslations(currentLanguage);
+      applyTranslations(); // Застосувати початкові переклади
 
-        /* СТИЛІ ЕКРАНУ ЗАВАНТАЖЕННЯ */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--light-grey);
-            color: var(--corporate-blue);
-            font-size: 2em;
-            text-align: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease-out;
-        }
-
-        .spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid var(--corporate-blue);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 2s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* СТИЛІ ПРОЕКТІВ */
-        .project-card {
-            background-color: var(--corporate-white);
-            border: 1px solid var(--border-grey);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .project-card h3 {
-            color: var(--corporate-blue);
-            margin-top: 0;
-            font-size: 1.8em;
-        }
-
-        /* НОВІ СТИЛІ ДЛЯ 3D ЛОГОТИПУ Weebwe LLC у картці проєкту */
-        .project-card .weebwe-logo-wrapper {
-            margin: 20px auto;
-            width: 120px;
-            height: 120px;
-            perspective: 400px; /* Adjust perspective for smaller logo */
-        }
-
-        .project-card .weebwe-logo-wrapper .logo-shape {
-            width: 120px;
-            height: 120px;
-            border-radius: 15px;
-            background: linear-gradient(45deg, var(--corporate-blue) 60%, #007bff); /* Subtle gradient */
-            transform-style: preserve-3d;
-        }
-
-        .project-card .weebwe-logo-wrapper .logo-letter {
-            font-size: 4.5em;
-            transform-style: preserve-3d;
-            /* transform: translateZ(8px); /* Slightly push forward */ */
-        }
-
-        /* НОВІ СТИЛІ ДЛЯ 3D ЛОГОТИПУ WeeClick */
-        .weeclick-logo-wrapper {
-            width: 150px;
-            height: 150px;
-            margin: 20px auto;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 8px var(--shadow-light);
-            border-radius: 50%;
-            overflow: hidden;
-            background-color: var(--corporate-white);
-            border: 8px solid var(--corporate-blue);
-            perspective: 500px; /* Add perspective */
-            transform-style: preserve-3d;
-            /* animation: perspectiveRotateCombined 3s linear 1.5s infinite; /* Keep the rotation */ */
-        }
-
-        .weeclick-logo-text {
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            font-size: 3.5em;
-            font-weight: bold;
-            color: var(--corporate-blue);
-            position: relative;
-            z-index: 2;
-            line-height: 1;
-            transform-style: preserve-3d;
-            /* transform: translateZ(10px); /* Slightly push forward */ */
-            /* animation: textPerspectiveRotateCombined 3s linear 1.5s infinite; /* Keep the text rotation */ */
-        }
-
-        /* Enhanced 3D animation for WeeClick wrapper */
-        @keyframes weeclickRotate3D {
-            0% { transform: perspective(500px) rotateY(0deg) rotateX(-10deg); } /* Added X rotation */
-            100% { transform: perspective(500px) rotateY(360deg) rotateX(-10deg); }
-        }
-
-        .weeclick-logo-wrapper {
-            animation: weeclickRotate3D 4s linear 1.5s infinite; /* Use the new animation */
-        }
-
-        /* Enhanced 3D animation for WeeClick text */
-        @keyframes weeclickTextRotate3D {
-            0% { transform: rotateY(0deg) translateZ(8px); } /* Slight Z translation */
-            100% { transform: rotateY(-360deg) translateZ(8px); }
-        }
-
-        .weeclick-logo-text {
-            animation: weeclickTextRotate3D 4s linear 1.5s infinite; /* Use the new animation */
-        }
-    </style>
+      showSection('home'); // Показуємо домашню секцію при завантаженні
+      updateNavHighlight(document.querySelector('nav a[data-section="home"]'));
+    });
+  </script>
 </head>
 <body>
-
-    <div id="loading-screen">
-        <div class="spinner"></div>
-        <p>Завантаження Weebwe LLC...</p>
+  <header>
+    <div class="header-left">
+      <img src="ico.svg" alt="Logo">
+      <h1>WEEBWE LLC</h1>
     </div>
-
-    <div id="main-content">
-        <header>
-            <div class="animated-logo-wrapper weebwe-header-logo">
-                <div class="logo-shape"><span class="logo-letter">W</span></div>
-            </div>
-            <h1>Weebwe LLC</h1>
-            <p>Інноваційна IT-компанія / Innovative IT Company</p>
-        </header>
-
-        <main>
-            <div id="home-page" class="page">
-                <section class="section">
-                    <h2>Про нас / About Us</h2>
-                    <p>Weebwe LLC — інноваційна IT-компанія, що спеціалізується на передових цифрових рішеннях. Ми створюємо веб-платформи, мобільні додатки та інтерактивні рішення, які допомагають нашим клієнтам досягати нових вершин.</p>
-                    <p>Наша місія — трансформувати ідеї у функціональні та естетичні продукти, використовуючи сучасні технології та інноваційні підходи. Ми пишаємося своєю командою професіоналів, які здатні реалізувати проєкти будь-якої складності, від стартапів до масштабних корпоративних систем.</p>
-                    <p>Weebwe LLC is an innovative IT company specializing in cutting-edge digital solutions. We develop web platforms, mobile applications, and interactive solutions that help our clients reach new heights.</p>
-                    <p>Our mission is to transform ideas into functional and aesthetic products using modern technologies and innovative approaches. We pride ourselves on our team of professionals who are capable of implementing projects of any complexity, from startups to large-scale corporate systems.</p>
-                </section>
-            </div>
-
-            <div id="services-page" class="page">
-                 <section class="section">
-                    <h2>Послуги / Services</h2>
-                    <p>У Weebwe LLC ми пропонуємо широкий спектр послуг для задоволення ваших цифрових потреб:</p>
-                    <ul>
-                        <li>✨ <b>Веб-додатки та сайти</b> / Web apps and websites</li>
-                        <li>📱 <b>Мобільні Android-додатки</b> / Android mobile apps</li>
-                        <li>🎮 <b>Telegram-ігри та боти</b> / Telegram games and bots</li>
-                        <li>🎓 <b>Освітні та бізнес-платформи</b> / Educational and business platforms</li>
-                        <li>🔗 <b>Блокчейн-інтеграції</b> / Blockchain integrations</li>
-                        <li>🎨 <b>UI/UX дизайн та прототипування</b> / UI/UX Design and Prototyping</li>
-                        <li>💡 <b>Консалтинг та технічна підтримка</b> / Consulting and Technical Support</li>
-                    </ul>
-                    <p><i>At Weebwe LLC, we offer a wide range of services to meet your digital needs.</i></p>
-                </section>
-            </div>
-
-            <div id="projects-page" class="page">
-                <section class="section">
-                    <h2>Вибрані Проекти / Featured Projects</h2>
-
-                    <div class="project-card">
-                        <h3>WeeClick</h3>
-                        <div class="weeclick-logo-wrapper">
-                            <span class="weeclick-logo-text">WEE</span>
-                        </div>
-                        <p><b>WeeClick</b> — це інноваційна веб-програма, що поєднує захоплюючу тапалку, інтерактивні завдання та різноманітні ігри, де користувачі можуть заробляти нашу ексклюзивну криптомонету. Проект створений Weebwe LLC, щоб надати користувачам унікальний досвід взаємодії з цифровими активами та розвагами. Виконуйте завдання, змагайтеся у рейтингах, розвивайте свій ігровий профіль і станьте частиною нашого блокчейн-спільноти!</p>
-                        <p><i><b>WeeClick</b> is an innovative web application that combines an engaging clicker game, interactive tasks, and various mini-games, where users can earn our exclusive cryptocurrency. The project is developed by Weebwe LLC to provide users with a unique experience of interacting with digital assets and entertainment. Complete tasks, compete in leaderboards, develop your gaming profile, and become part of our blockchain community!</i></p>
-                    </div>
-
-                    <div class="project-card">
-                        <h3>Інший Проект (Приклад)</h3>
-                         <div class="weebwe-logo-wrapper animated-logo-wrapper">
-                            <div class="logo-shape"><span class="logo-letter">W</span></div>
-                        </div>
-                        <p>Короткий опис вашого іншого проекту. Його можливості, технології, тощо. Це приклад, ви можете замінити цей розділ на реальний опис іншого проекту.</p>
-                    </div>
-
-                </section>
-            </div>
-
-            <div id="contact-page" class="page">
-                <section class="section">
-                    <h2>Контакти / Contact</h2>
-                    <p>Ми завжди відкриті до співпраці та нових ідей. Зв'яжіться з нами, щоб обговорити ваш проєкт!</p>
-                    <p>📧 Email: <a href="mailto:weeb.llc@gmail.com">weeb.llc@gmail.com</a></p>
-                    <p>💬 Telegram: <a href="https://t.me/weebwe" target="_blank">@weebwe</a></p>
-                    <p>📍 Адреса: Україна, м. Київ (Ця адреса є прикладом і може бути змінена)</p>
-                    <p>We are always open to collaboration and new ideas. Contact us to discuss your project!</p>
-                </section>
-            </div>
-        </main>
-
-        <footer>
-            <a href="#" class="nav-button" id="nav-home" onclick="showPage('home-page', this)">
-                <span>🏠</span> Головна
-            </a>
-            <a href="#" class="nav-button" id="nav-services" onclick="showPage('services-page', this)">
-                <span>🛠️</span> Послуги
-            </a>
-            <a href="#" class="nav-button" id="nav-projects" onclick="showPage('projects-page', this)">
-                <span>📂</span> Проекти
-            </a>
-            <a href="#" class="nav-button" id="nav-contact" onclick="showPage('contact-page', this)">
-                <span>📞</span> Контакти
-            </a>
-        </footer>
+    <div class="language-switcher">
+      <button class="language-button" onclick="openLanguageModal()">Вибір мови</button>
     </div>
+  </header>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loadingScreen = document.getElementById('loading-screen');
-            const mainContent = document.getElementById('main-content');
-            const pages = document.querySelectorAll('.page');
-            const navButtons = document.querySelectorAll('.nav-button');
+  <main>
+    <section id="home" class="active">
+      <h2 data-lang-key="home_title">Company News</h2>
+      <div class="content-list" id="news-list">
+        <p data-lang-key="loading_content">Завантаження новин...</p>
+      </div>
+    </section>
 
-            // Функція для показу певної сторінки
-            window.showPage = function(pageId, clickedButton = null) {
-                pages.forEach(page => {
-                    page.style.display = 'none'; // Приховати всі сторінки
-                });
-                document.getElementById(pageId).style.display = 'block'; // Показати потрібну сторінку
+    <section id="about">
+      <h2 data-lang-key="about_title">Про нас</h2>
+      <p data-lang-key="about_text_full_1">Ми, WEEBWE LLC, є інноваційною компанією, що спеціалізується на розробці програмного забезпечення та технологічних рішень. Наша місія — створювати високоякісні, зручні та ефективні продукти, які покращують життя наших користувачів та оптимізують бізнес-процеси.</p>
+      <p data-lang-key="about_text_full_2">Наша команда складається з висококваліфікованих фахівців у галузі розробки, дизайну та управління проектами. Ми віримо в постійне вдосконалення, використання передових технологій та індивідуальний підхід до кожного проекту. Це дозволяє нам надавати рішення, які точно відповідають потребам наших клієнтів.</p>
+      <p data-lang-key="about_text_full_3">Ми прагнемо до довгострокових відносин з нашими партнерами та клієнтами, будуючи їх на довірі, прозорості та взаємовигідній співпраці. Завдяки нашому досвіду та прагненню до досконалості, WEEBWE LLC є надійним партнером для реалізації ваших найсміливіших технологічних ідей.</p>
+    </section>
 
-                // Видалити клас 'active' з усіх кнопок
-                navButtons.forEach(button => {
-                    button.classList.remove('active');
-                });
-                // Додати клас 'active' до натиснутої кнопки
-                if (clickedButton) {
-                    clickedButton.classList.add('active');
-                } else {
-                    // Якщо кнопка не була передана (наприклад, при початковому завантаженні),
-                    // активувати кнопку "Головна"
-                    document.getElementById('nav-home').classList.add('active');
-                }
+    <section id="projects">
+      <h2 data-lang-key="projects_title">Проекти</h2>
+      <p data-lang-key="projects_intro">Ознайомтеся з нашими успішними проектами, які демонструють наш досвід та інноваційний підхід.</p>
+      <div class="content-list" id="projects-list">
+        <p data-lang-key="loading_content">Завантаження проектів...</p>
+      </div>
+    </section>
 
-                // Прокрутка до верху сторінки після перемикання
-                window.scrollTo(0, 0);
-            }
+    <section id="docs">
+      <h2 data-lang-key="docs_title">Документи</h2>
+      <p data-lang-key="docs_intro">Тут ви знайдете важливі документи та посібники.</p>
+      <div class="content-list" id="docs-list">
+        <div class="list-item">
+          <h3 data-lang-key="doc_1_title">Угода користувача</h3>
+          <p data-lang-key="doc_1_description">Повний текст угоди користувача, що регулює використання наших послуг.</p>
+          <p class="item-meta"><a href="#" target="_blank" data-lang-key="doc_1_link">Переглянути документ</a></p>
+        </div>
+        <div class="list-item">
+          <h3 data-lang-key="doc_2_title">Політика конфіденційності</h3>
+          <p data-lang-key="doc_2_description">Ознайомтеся з нашою політикою конфіденційності даних.</p>
+          <p class="item-meta"><a href="#" target="_blank" data-lang-key="doc_2_link">Переглянути документ</a></p>
+        </div>
+        <div class="list-item">
+          <h3 data-lang-key="doc_3_title">Інструкція з використання API</h3>
+          <p data-lang-key="doc_3_description">Детальний посібник для розробників щодо інтеграції з нашим API.</p>
+          <p class="item-meta"><a href="#" target="_blank" data-lang-key="doc_3_link">Переглянути документ</a></p>
+        </div>
+      </div>
+    </section>
 
-            // Логіка екрану завантаження
-            setTimeout(function() {
-                loadingScreen.style.opacity = '0'; // Запускаємо анімацію зникнення
-                loadingScreen.addEventListener('transitionend', function() {
-                    loadingScreen.style.display = 'none'; // Повністю приховуємо після анімації
-                    mainContent.style.display = 'flex'; // Показуємо основний контент
-                    showPage('home-page', document.getElementById('nav-home')); // Показуємо головну сторінку за замовчуванням і активуємо кнопку
-                }, { once: true }); // Виконуємо слухач один раз
-            }, 3000); // Час завантаження в мілісекундах (3 секунди)
-        });
-    </script>
+    <section id="contact">
+      <h2 data-lang-key="contact_title">Контакти</h2>
+      <p data-lang-key="contact_intro">Зв'яжіться з нами для отримання додаткової інформації або підтримки.</p>
+      <div class="content-list" id="contact-list">
+        <div class="list-item">
+          <h3 data-lang-key="contact_telegram_title">Telegram</h3>
+          <p data-lang-key="contact_telegram_text">Приєднуйтесь до нашого офіційного каналу Telegram для новин та оновлень.</p>
+          <p class="item-meta"><a href="https://t.me/weebwe_official" target="_blank" data-lang-key="contact_telegram_link">Відвідати канал</a></p>
+        </div>
+
+        <div class="list-item">
+          <h3 data-lang-key="contact_email_title">Електронна пошта</h3>
+          <p data-lang-key="contact_email_text">Напишіть нам на електронну пошту для загальних запитів.</p>
+          <p class="item-meta"><a href="mailto:info@weebwe.com" data-lang-key="contact_email_link">info@weebwe.com</a></p>
+        </div>
+
+        <div class="list-item">
+          <h3 data-lang-key="contact_support_title">Підтримка</h3>
+          <p data-lang-key="contact_support_text">Зверніться до нашої служби підтримки з будь-якими питаннями.</p>
+          <p class="item-meta"><a href="#" target="_blank" data-lang-key="contact_support_link">Отримати підтримку</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav>
+    <div id="nav-highlight"></div>
+    <a href="#home" data-section="home" onclick="showSection('home')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span data-lang-key="nav_home">Головна</span>
+    </a>
+    <a href="#about" data-section="about" onclick="showSection('about')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span data-lang-key="nav_about">Про нас</span>
+    </a>
+    <a href="#projects" data-section="projects" onclick="showSection('projects')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+      <span data-lang-key="nav_projects">Проекти</span>
+    </a>
+    <a href="#docs" data-section="docs" onclick="showSection('docs')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+      <span data-lang-key="nav_docs">Документи</span>
+    </a>
+    <a href="#contact" data-section="contact" onclick="showSection('contact')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      <span data-lang-key="nav_contact">Контакти</span>
+    </a>
+  </nav>
+
+  <div id="languageModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" onclick="closeLanguageModal()">&times;</span>
+      <h3>Виберіть мову</h3>
+      <div class="modal-flags">
+        <div class="lang-option" onclick="selectLanguageAndClose('en')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/us.svg" alt="English">
+            <span>English</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('uk')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/ua.svg" alt="Українська">
+            <span>Українська</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('de')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/de.svg" alt="Deutsch">
+            <span>Deutsch</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('fr')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/fr.svg" alt="Français">
+            <span>Français</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('es')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/es.svg" alt="Español">
+            <span>Español</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('it')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/it.svg" alt="Italiano">
+            <span>Italiano</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('pl')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/pl.svg" alt="Polski">
+            <span>Polski</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('jp')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/jp.svg" alt="日本語">
+            <span>日本語</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('kr')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/kr.svg" alt="한국어">
+            <span>한국어</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('cn')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/cn.svg" alt="中文">
+            <span>中文</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('ar')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/sa.svg" alt="العربية">
+            <span>العربية</span>
+        </div>
+        <div class="lang-option" onclick="selectLanguageAndClose('pt')">
+            <img src="https://flagicons.lipis.dev/flags/4x3/pt.svg" alt="Português">
+            <span>Português</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 
