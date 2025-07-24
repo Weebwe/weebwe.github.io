@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -572,7 +573,10 @@
      * потрібно створити окрему колекцію "documents" і адаптувати цю функцію.
      */
     async function loadDocs() {
+      // Для цієї секції ми не показуємо "Завантаження контенту",
+      // оскільки її елементи вже є в HTML і просто оновлюються перекладами.
       const docsList = document.getElementById('docs-list');
+
       // Оновлюємо href для посилань документів
       const doc1LinkElem = docsList.querySelector('[data-lang-key="doc_1_link"]');
       if (doc1LinkElem && currentTranslations.doc_1_url) {
@@ -597,7 +601,10 @@
      * потрібно створити окрему колекцію "contacts" і адаптувати цю функцію.
      */
     async function loadContact() {
+        // Для цієї секції ми не показуємо "Завантаження контенту",
+        // оскільки її елементи вже є в HTML і просто оновлюються перекладами.
         const contactList = document.getElementById('contact-list');
+
         // Оновлюємо href для посилань контактів
         const telegramLinkElement = contactList.querySelector('[data-lang-key="contact_telegram_link"]');
         if (telegramLinkElement && currentTranslations.contact_telegram_url) {
@@ -644,6 +651,8 @@
       main.scrollTop = 0; // Скидаємо скролл при зміні секції
 
       // Завантажуємо дані для активної секції
+      // Примітка: для 'docs' та 'contact' ми викликаємо функції, які лише застосовують переклади
+      // до вже існуючих статичних елементів, а не завантажують дані з Firestore.
       if (id === 'home') {
         loadNews();
       } else if (id === 'projects') {
@@ -689,10 +698,11 @@
       applyTranslations(); // Застосовуємо завантажені переклади
 
       // Повторно завантажуємо динамічний контент, щоб він також оновився мовою
+      // await додано, щоб переклади застосовувалися до завантаженого контенту після його появи.
       if (currentSection === 'home') await loadNews();
       if (currentSection === 'projects') await loadProjects();
-      if (currentSection === 'docs') await loadDocs();
-      if (currentSection === 'contact') await loadContact();
+      if (currentSection === 'docs') await loadDocs(); // Ці функції вже викликають applyTranslations
+      if (currentSection === 'contact') await loadContact(); // Ці функції вже викликають applyTranslations
 
       closeLanguageModal();
     }
@@ -706,11 +716,6 @@
 
     // Ініціалізація при завантаженні сторінки
     document.addEventListener('DOMContentLoaded', async () => {
-      // Чекаємо, поки Firebase SDK буде доступний
-      // Оскільки Firebase SDK імпортується як модуль, він буде доступний
-      // до виконання цього DOMContentLoaded, якщо немає помилок завантаження.
-      // Попередній Promise/setTimeout видалено для спрощення.
-
       // Завантажуємо переклади перед тим, як показувати секції
       await loadTranslations(currentLanguage);
       applyTranslations(); // Застосувати початкові переклади
@@ -883,4 +888,3 @@
   </div>
 </body>
 </html>
-
